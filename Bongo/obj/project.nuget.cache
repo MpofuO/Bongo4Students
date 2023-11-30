@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "z8SvySMPyF88BiONWKcCpQGC9/CUpQ+EX6nqZJcl96kHT6ael4u2jzXRKJ+6VbSP6W3tabxllebu04Jmf3SlQg==",
+  "dgSpecHash": "OniKC2ux/fUxNIu1PEknI8mxrvbFbZwX2MJ9WFKNbv3uGhHYN9cuR56/O3QuizEPsYJ5pWksQp2kOiJsnqWA+A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\20208\\Desktop\\New folder\\Bongo4Students\\Bongo\\Bongo.csproj",
+  "projectFilePath": "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\Bongo.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\20208\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\20208\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
