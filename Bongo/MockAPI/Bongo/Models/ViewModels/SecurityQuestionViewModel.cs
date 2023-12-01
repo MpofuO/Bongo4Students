@@ -10,8 +10,6 @@ namespace Bongo.MockAPI.Bongo.Models.ViewModels
         [Display(Name = "Answer")]
         public string SecurityAnswer { get; set; }
 
-        public string UserName { get; set; }
-
         public string SendingAction { get; set; }
     }
 }

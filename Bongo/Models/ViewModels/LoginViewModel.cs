@@ -6,6 +6,7 @@ namespace Bongo.Models.ViewModels
     public class LoginViewModel
     {
         [Required(ErrorMessage = "Required")]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -41,9 +42,9 @@ namespace Bongo.Models.ViewModels
 
     public class ForgotPassword
     {
-        [Required(ErrorMessage = "Required")]
-        [Display(Name = "Username")]
-        public string Username { get; set; }
+        [Display(Name = "Email")]
+        [EmailAddress]
+        public string Email { get; set; }
     }
 
     public class ResetPassword

@@ -205,7 +205,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                     return BadRequest();
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                return Ok(token);
+                return Ok(new string[] { token, user.Id });
             }
             return NotFound();
         }
