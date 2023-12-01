@@ -1,6 +1,7 @@
 using Bongo.Data;
-using Bongo.Models;
-using Bongo.Services;
+using Bongo.MockAPI.Bongo.Data;
+using Bongo.MockAPI.Bongo.Models;
+using Bongo.MockAPI.Bongo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,10 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(typeof(MyAuthorize));
+});
 builder.Services.AddScoped<IEndpointWrapper, EndpointWrapper>();
 builder.Services.AddTransient<IMailService, MailService>();
 
@@ -26,6 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
+#region In API
 builder.Services.AddIdentity<BongoUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -33,6 +38,7 @@ builder.Services.AddIdentity<BongoUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>().AddTokenProvider<DataProtectorTokenProvider<BongoUser>>(TokenOptions.DefaultProvider);
+#endregion
 
 builder.Services.AddScoped<IPasswordValidator<BongoUser>, CustomPasswordValidator>();
 builder.Services.AddHttpContextAccessor();
@@ -58,7 +64,10 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+//In API
 SeedData.EnsurePopulated(app);
+
+
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(app.Configuration.GetValue<string>("SyncfusionKey:Key"));
 
 app.Run();

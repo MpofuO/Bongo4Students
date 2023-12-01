@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\Bongo.csproj": {}
+    "C:\\Users\\20208\\source\\repos\\Bongo4Students\\Bongo\\Bongo.csproj": {}
   },
   "projects": {
-    "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\Bongo.csproj": {
+    "C:\\Users\\20208\\source\\repos\\Bongo4Students\\Bongo\\Bongo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\Bongo.csproj",
+        "projectUniqueName": "C:\\Users\\20208\\source\\repos\\Bongo4Students\\Bongo\\Bongo.csproj",
         "projectName": "Bongo",
-        "projectPath": "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\Bongo.csproj",
+        "projectPath": "C:\\Users\\20208\\source\\repos\\Bongo4Students\\Bongo\\Bongo.csproj",
         "packagesPath": "C:\\Users\\20208\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\20208\\Source\\Repos\\Bongo4Students\\Bongo\\obj\\",
+        "outputPath": "C:\\Users\\20208\\source\\repos\\Bongo4Students\\Bongo\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -47,45 +47,37 @@
           "dependencies": {
             "MailKit": {
               "target": "Package",
-              "version": "[4.2.0, )"
-            },
-            "Microsoft.AspNetCore.Authentication.JwtBearer": {
-              "target": "Package",
-              "version": "[7.0.14, )"
+              "version": "[4.3.0, )"
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[7.0.13, )"
+              "version": "[7.0.14, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[7.0.13, )"
+              "version": "[7.0.14, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[7.0.13, )"
+              "version": "[7.0.14, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[7.0.13, )"
+              "version": "[7.0.14, )"
             },
-            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+            "MimeKit": {
               "target": "Package",
-              "version": "[7.0.11, )"
+              "version": "[4.3.0, )"
             },
             "Syncfusion.Pdf.Net.Core": {
               "target": "Package",
-              "version": "[23.1.43, )"
-            },
-            "System.Net.Http": {
-              "target": "Package",
-              "version": "[4.3.4, )"
+              "version": "[23.2.6, )"
             },
             "itext7": {
               "target": "Package",
-              "version": "[8.0.2, )"
+              "version": "[7.2.5, )"
             }
           },
           "imports": [

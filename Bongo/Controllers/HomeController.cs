@@ -1,37 +1,28 @@
 ﻿using Bongo.Data;
 using Bongo.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Controllers
 {
-    [Authorize]
+    [MyAuthorize]
     public class HomeController : Controller
     {
-        private readonly UserManager<BongoUser> _userManager;
-        private readonly IEndpointWrapper endpoint;
+        private readonly IEndpointWrapper wrapper;
 
-        public HomeController(IEndpointWrapper _endpoint, UserManager<BongoUser> userManager)
+        public HomeController(IEndpointWrapper _wrapper)
         {
-            endpoint = _endpoint;
-            _userManager = userManager;
+            wrapper = _wrapper;
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
+            if (Current.IsAuthenticated)
             {
-                var cookie = Request.Cookies["userTokenExpDate"];
-                var tokenExpDate = cookie is not null ? DateTime.Parse(cookie) : default;
-                if (tokenExpDate < DateTime.UtcNow)
-                    RedirectToAction("Logout", "Account");
-
-                var response = await endpoint.Timetable.GetUserTimetable();
+                var response = await wrapper.Timetable.GetUserTimetable();
                 TempData["HasTimetable"] = response.IsSuccessStatusCode;
-                var user = await _userManager.FindByNameAsync(User.Identity.Name);
-                if (user.MergeKey == default)
+                if (Current.User.MergeKey == default)
                     return RedirectToAction("MergeKey", "Account");
             }
             else
@@ -42,24 +33,23 @@ namespace Bongo.Controllers
         [HttpPost]
         public async Task<IActionResult> Notice()
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var user = Current.User;
             user.Notified = true;
-            await _userManager.UpdateAsync(user);
+            await wrapper.User.Update(user);
             Response.Cookies.Append("Notified", user.Notified.ToString().ToLower(),
                             new CookieOptions { Expires = DateTime.Now.AddDays(90) }
                             );
             return RedirectToAction("Index");
         }
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            return View(user);
+            return View(Current.User);
         }
         [HttpPost]
         [ActionName("Profile")]
         public async Task<IActionResult> UpdateProfile(string id, string action, string newValue)
         {
-            BongoUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var user = Current.User;
 
             switch (id)
             {
@@ -68,8 +58,8 @@ namespace Bongo.Controllers
                 case "mergeKey": user.MergeKey = newValue; break;
             }
 
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            var result = await wrapper.User.Update(user);
+            if (result.IsSuccessStatusCode)
                 TempData["Message"] = "Your account detail(s) have successfully been updated";
             else
                 TempData["Message"] = "Failed to update account detail(s)";

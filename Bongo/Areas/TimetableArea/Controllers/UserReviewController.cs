@@ -8,7 +8,7 @@
 
 //namespace Bongo.Areas.TimetableArea.Controllers
 //{
-//    [Authorize]
+//    [MyAuthorize]
 //    [Area("TimetableArea")]
 //    public class UserReviewController : Controller
 //    {

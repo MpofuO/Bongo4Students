@@ -1,1 +1,2 @@
-﻿public enum SessionType { Class, Study}
+﻿namespace Bongo;
+public enum SessionType { Class, Study}

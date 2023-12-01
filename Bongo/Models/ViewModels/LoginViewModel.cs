@@ -6,7 +6,7 @@ namespace Bongo.Models.ViewModels
     public class LoginViewModel
     {
         [Required(ErrorMessage = "Required")]
-        public string Username { get; set; }
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Required")]
         [UIHint("password")]
