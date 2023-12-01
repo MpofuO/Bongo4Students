@@ -1,6 +1,6 @@
 ﻿using Bongo.MockAPI.Bongo.Infrastructure;
-using Bongo.Models;
-using Bongo.Models.ViewModels;
+using Bongo.MockAPI.Bongo.Models;
+using Bongo.MockAPI.Bongo.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +89,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
             {
                 if (await _userManager.FindByNameAsync(Encryption.Encrypt(registerModel.UserName.Trim())) != null)
                 {
-                    return StatusCode(409, "Username already exists. Please use a different username.");
+                    return StatusCode(409, "Username already exists. Please use a different email.");
                 }
                 var user = new BongoUser
                 {
@@ -103,26 +103,23 @@ namespace Bongo.MockAPI.Bongo.Controllers
                 {
                     try
                     {
-                        //var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        //var token = await userManager.GeneratePasswordResetTokenAsync(user);
                         /* Dictionary<string, string> emailOptions = new Dictionary<string, string>
-                         { { "username", user.UserName},
+                         { { "email", user.UserName},
                            { "link",_config.GetValue<string>("Application:AppDomain") + $"Account/ConfirmEmail?userId={user.Id}&token{token}" }
                          };
  */
                         //await _mailSender.SendMailAsync(registerModel.Email, "Welcome to Bongo", "WelcomeEmail", emailOptions);
-                        return StatusCode(201);
+                        return Ok();
                     }
                     catch (Exception)
                     {
                         return StatusCode(500, "Something went wrong while registering your account. It's not you, it's us💀");
                     }
                 }
-
                 else
                 {
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError("", error.Description);
-                    return StatusCode(406, ModelState);
+                    return StatusCode(406, result.Errors);
                 }
 
             }
@@ -165,11 +162,11 @@ namespace Bongo.MockAPI.Bongo.Controllers
 
         [HttpGet("VerifyUsername/{username}")]
         [AllowAnonymous]
-        public async Task<IActionResult> VerifyUsername(string username)
+        public async Task<IActionResult> VerifyEmail(string email)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(Encryption.Encrypt(username));
+                var user = await _userManager.FindByEmailAsync(Encryption.Encrypt(email));
                 if (user != null)
                     return Ok();
             }
@@ -187,7 +184,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                 {
                     if (user.SecurityAnswer.ToLower().Trim() == Encryption.Encrypt(model.SecurityAnswer.ToLower().Trim()))
                     {
-                        return await ChangePassword(user.Id);
+                        return await ChangePassword(user.Id, true, model.SecurityAnswer);
                     }
                     return StatusCode(406, $"Incorrect answer. Please try again.");
                 }
@@ -198,11 +195,15 @@ namespace Bongo.MockAPI.Bongo.Controllers
 
         [HttpGet("ChangePassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ChangePassword(string userId)
+        public async Task<IActionResult> ChangePassword(string userId, bool fromForgot = false, string secAnswer = "")
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
+
+                if (!(fromForgot && user.SecurityAnswer == Encryption.Encrypt(secAnswer)))
+                    return BadRequest();
+
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 return Ok(token);
             }
@@ -222,20 +223,21 @@ namespace Bongo.MockAPI.Bongo.Controllers
                     {
                         return Ok();
                     }
-                    foreach (var error in result.Errors)
-                        ModelState.AddModelError("", error.Description);
+                    return StatusCode(406, result.Errors);
                 }
             }
             return BadRequest(ModelState);
         }
 
         [HttpPost("UpdateSecurityQuestion")]
-        [AllowAnonymous]
-        public async Task<IActionResult> UpdateSecurityQuestion([FromBody]SecurityQuestionViewModel model)
+        public async Task<IActionResult> UpdateSecurityQuestion([FromBody] SecurityQuestionViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(Encryption.Encrypt(model.UserName));
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+                if (user is null)
+                    return NotFound();
+
                 user.SecurityQuestion = Encryption.Encrypt(model.SecurityQuestion);
                 user.SecurityAnswer = Encryption.Encrypt(model.SecurityAnswer);
                 await _userManager.UpdateAsync(user);

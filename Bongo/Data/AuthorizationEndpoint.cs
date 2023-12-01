@@ -59,9 +59,9 @@ namespace Bongo.Data
             }
         }
 
-        public async Task<HttpResponseMessage> VerifyUsername(string username)
+        public async Task<HttpResponseMessage> VerifyEmail(string email)
         {
-            return await Client.GetAsync(new Uri($"{URI}/VerifyUsername/{username}"));
+            return await Client.GetAsync(new Uri($"{URI}/VerifyEmail/{email}"));
         }
     }
 }

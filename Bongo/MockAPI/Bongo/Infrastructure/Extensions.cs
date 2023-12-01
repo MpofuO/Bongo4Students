@@ -1,4 +1,4 @@
-﻿using Bongo.Models;
+﻿using Bongo.MockAPI.Bongo.Models;
 
 namespace Bongo.MockAPI.Bongo.Infrastructure
 {
