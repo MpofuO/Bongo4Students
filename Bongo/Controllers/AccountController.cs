@@ -53,7 +53,7 @@ namespace Bongo.Controllers
                     if (Current.User.SecurityQuestion != default)
                         return RedirectToAction("Index", "Home");
                     else
-                        return RedirectToAction("SecurityQuestion", new { username = Current.User.UserName, sendingAction = "LogIn" });
+                        return RedirectToAction("SecurityQuestion", new { sendingAction = "LogIn" });
                 }
                 else
                 {
@@ -62,7 +62,7 @@ namespace Bongo.Controllers
                 }
 
             }
-            ModelState.AddModelError("", "Invalid username or password");
+            ModelState.AddModelError("", "Invalid email or password");
         OnError:
             return View("SignIn", loginModel);
         }
@@ -80,6 +80,22 @@ namespace Bongo.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _wrapper.Authorization.Register(registerModel);
+                switch ((int)result.StatusCode)
+                {
+                    case 200:
+                        TempData[Message] = "Registered successfully";
+                        return RedirectToAction("Index", "Home");
+                    case 409:
+                        ModelState.AddModelError("", "Email used by another user. Please use a unique email"); break;
+                    case 406:
+                        foreach (var error in await result.Content.ReadFromJsonAsync<IEnumerable<IdentityError>>())
+                            ModelState.AddModelError("", error.Description);
+                        break;
+                    case 500:
+                        ModelState.AddModelError("", "Something went wrong. Please try again."); break;
+                    default:
+                        break;
+                }
             }
             return View(registerModel);
         }
@@ -98,22 +114,26 @@ namespace Bongo.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult VerifyEmail()
+        {
+            return View();
+        }
+
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> VerifyUsername(string username)
+        public async Task<IActionResult> VerifyEmail(string email)
         {
             if (ModelState.IsValid)
             {
-                var result = await _wrapper.Authorization.VerifyUsername(username);
-            }
-            return View("ForgotPassword", new ForgotPassword { Username = username });
-        }
+                var result = await _wrapper.Authorization.VerifyEmail(email);
+                if (result.IsSuccessStatusCode)
+                    return View("AskSecurityQuestion", new AnswerSecurityQuestionViewModel { Email = email });
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPassword(string username)
-        {
-            return View(new ForgotPassword { Username = username });
+                ModelState.AddModelError("", $"User with email {email} does not exist. Please enter a valid email.");
+            }
+            return View(new ForgotPassword { Email = email });
         }
 
         [HttpPost]
@@ -123,15 +143,38 @@ namespace Bongo.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _wrapper.Authorization.ForgotPassword(model);
+                switch ((int)result.StatusCode)
+                {
+                    case 200:
+                        string[] arr = await result.Content.ReadFromJsonAsync<string[]>();
+                        return RedirectToAction("ResetPassword", new { userId = arr[1], token = arr[0] });
+                    case 406:
+                        ModelState.AddModelError("", "Incorrect answer. Please answer the question correctly to continue.");
+                        break;
+                    default:
+                        ModelState.AddModelError("", $"Something went wrong with email {model.Email}. Please try again, if the problem persists contact us.");
+                        break;
+                }
             }
-            ModelState.AddModelError("", $"Something went wrong with email {model.Email}. Please try again, if the problem persists contact us.");
-            return View(new { email = model.Email });
+            return View("AskSecurityQuestion", model);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> ChangePassword(string userId)
         {
             var result = await _wrapper.Authorization.ChangePassword(userId);
+            switch ((int)result.StatusCode)
+            {
+                case 200:
+                    string[] arr = await result.Content.ReadFromJsonAsync<string[]>();
+                    return RedirectToAction("ResetPassword", new { userId = arr[1], token = arr[0] });
+                case 400:
+                    TempData["Message"] = $"Invalid request. You are not authorized to change the password for user with id: {userId}";
+                    break;
+                default:
+                    TempData["Message"] = $"Invalid request. No user with id {userId} was found";
+                    break;
+            }
             return RedirectToAction("Index", "Home");
         }
 
@@ -150,35 +193,53 @@ namespace Bongo.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _wrapper.Authorization.ResetPassword(model);
+                switch ((int)result.StatusCode)
+                {
+                    case 200:
+                        TempData["Message"] = "Successfully changed password";
+                        return RedirectToAction("Index", "Home");
+                    case 404:
+                        ModelState.AddModelError("", "User not found"); break;
+                    case 406:
+                        foreach (var error in await result.Content.ReadFromJsonAsync<IEnumerable<IdentityError>>())
+                            ModelState.AddModelError("", error.Description); break;
+                    default: break;
+                }
             }
             return View(model);
         }
-        [AllowAnonymous]
-        public IActionResult SecurityQuestion(string username, string sendingAction)
+
+        public IActionResult SecurityQuestion(string sendingAction)
         {
-            return View(new SecurityQuestionViewModel { UserName = username, SendingAction = sendingAction });
+            return View(new SecurityQuestionViewModel { SendingAction = sendingAction });
         }
         [HttpPost]
-        [AllowAnonymous]
         [ActionName("SecurityQuestion")]
         public async Task<IActionResult> UpdateSecurityQuestion(SecurityQuestionViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var result = await _wrapper.Authorization.UpdateSecurityQuestion(model);
-
-
-                bool fromRegister = model.SendingAction == "Register";
-                if (fromRegister)
+                switch ((int)result.StatusCode)
                 {
-                    return RedirectToAction("SignIn", "Account");
+                    case 200:
+                        TempData["Message"] = "Successfully updated security question and/or answer."; break;
+                    case 404:
+                        ModelState.AddModelError("", "User not found");
+                        goto onModelError;
+                    default:
+                        foreach (var error in await result.Content.ReadFromJsonAsync<IEnumerable<IdentityError>>())
+                            ModelState.AddModelError("", error.Description);
+                        goto onModelError;
                 }
-                else if (model.SendingAction == "Profile")
+
+                if (model.SendingAction == "Profile")
                 {
                     return RedirectToAction("Profile", "Home");
                 }
                 return RedirectToAction("Index", "Home");
             }
+        onModelError:
             return View(model);
         }
         public async Task<IActionResult> Logout()
