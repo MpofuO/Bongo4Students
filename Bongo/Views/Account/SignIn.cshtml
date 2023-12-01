@@ -29,9 +29,9 @@
     <form class="mb-4" asp-action="Login" asp-controller="Account" method="post">
         <div class="text-danger" asp-validation-summary="ModelOnly"></div>
         <div class="mb-4">
-            <label class="form-label" asp-for="Username"></label>
-            <span asp-validation-for="Username" class="text-danger"></span>
-            <input type="text" class="form-control" placeholder="eg. user101" asp-for="Username" />
+            <label class="form-label" asp-for="Email"></label>
+            <span asp-validation-for="Email" class="text-danger"></span>
+            <input type="text" class="form-control" placeholder="eg. user@gmail.com" asp-for="Email" />
         </div>
         <div class="mb-4">
             <label class="form-label" for="password_login" asp-for="Password">Password</label>

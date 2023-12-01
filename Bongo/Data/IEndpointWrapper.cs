@@ -4,6 +4,7 @@ namespace Bongo.Data
 {
     public interface IEndpointWrapper
     {
+        IUserEndpoint User { get; }
         IColorEndpoint Color { get; }
         IMergerEndpoint Merger { get; }
         ISessionEndpoint Session { get; }

@@ -20,7 +20,7 @@ using PdfPage = Syncfusion.Pdf.PdfPage;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [Authorize]
+    [MyAuthorize]
     [Area("TimetableArea")]
     public class TimetableController : Controller
     {

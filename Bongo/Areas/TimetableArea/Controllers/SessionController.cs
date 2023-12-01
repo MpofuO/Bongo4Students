@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [Authorize]
+    [MyAuthorize]
     [Area("TimetableArea")]
     public class SessionController : Controller
     {

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [Authorize]
+    [MyAuthorize]
     [Area("TimetableArea")]
     public class MergerController : Controller
     {
