@@ -1,4 +1,5 @@
 using Bongo.Data;
+using Bongo.MockAPI;
 using Bongo.MockAPI.Bongo.Data;
 using Bongo.MockAPI.Bongo.Models;
 using Bongo.MockAPI.Bongo.Services;
@@ -23,6 +24,7 @@ builder.Services.AddControllersWithViews(options =>
 });
 builder.Services.AddScoped<IEndpointWrapper, EndpointWrapper>();
 builder.Services.AddTransient<IMailService, MailService>();
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -66,6 +68,7 @@ app.MapControllerRoute(
 
 //In API
 SeedData.EnsurePopulated(app);
+Global.app = app;
 
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(app.Configuration.GetValue<string>("SyncfusionKey:Key"));

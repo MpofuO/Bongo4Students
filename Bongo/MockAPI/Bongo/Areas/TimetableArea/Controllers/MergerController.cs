@@ -43,13 +43,13 @@ public class MergerController : Controller
     ///</list>
     /// </returns>
     [HttpGet("{isForFirstSemester}")]
-    public IActionResult InitialiseMerger(bool isForFirstSemester)
+    public async Task<IActionResult> InitialiseMerger(bool isForFirstSemester)
     {
         _isForFirstSemester = isForFirstSemester;
         mergedUsers = new();
         var timetabe = repository.Timetable.GetUserTimetable(User.Identity.Name);
         if (timetabe != null)
-            return AddUserTimetable(User.Identity.Name);
+            return await AddUserTimetable(User.Identity.Name);
 
         return NotFound("Please create your timetable before you can merge with others.");
     }
@@ -83,7 +83,7 @@ public class MergerController : Controller
     ///</list>
     ///</returns>
     [HttpGet("{username}")]
-    public IActionResult AddUserTimetable(string username)
+    public async Task<IActionResult> AddUserTimetable(string username)
     {
         if (mergedUsers.Contains(username))
         {
@@ -139,7 +139,7 @@ public class MergerController : Controller
     ///</list>
     ///</returns>
     [HttpGet("{username}")]
-    public IActionResult RemoveUserTimetable(string username)
+    public async Task<IActionResult> RemoveUserTimetable(string username)
     {
         if (mergedUsers.Contains(username))
         {

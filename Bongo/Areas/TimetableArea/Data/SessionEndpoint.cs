@@ -1,6 +1,4 @@
 ﻿using Bongo.Areas.TimetableArea.Models.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 namespace Bongo.Areas.TimetableArea.Data
 {
@@ -34,7 +32,7 @@ namespace Bongo.Areas.TimetableArea.Data
 
         public async Task<HttpResponseMessage> DeleteSession(string session)
         {
-            return await Client.DeleteAsync(new Uri($"{URI}/DeleteSession/{session}"));
+            return await Client.GetAsync(new Uri($"{URI}/DeleteSession/{session}"));
         }
 
         public async Task<HttpResponseMessage> GetClashes()

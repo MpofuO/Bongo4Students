@@ -146,7 +146,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpGet("isForFirstSemester")]
-    public IActionResult GetTimetableSessions(bool isForFirstSemester)
+    public async Task<IActionResult> GetTimetableSessions(bool isForFirstSemester)
     {
         _isForFirstSemester = isForFirstSemester;
         if (Initialise())
@@ -171,7 +171,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpGet]
-    public IActionResult GetClashes()
+    public async Task<IActionResult> GetClashes()
     {
         if (Initialise())
         {
@@ -191,7 +191,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpGet]
-    public IActionResult GetGroups()
+    public async Task<IActionResult> GetGroups()
     {
         if (Initialise())
         {
@@ -213,7 +213,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpGet("{sessionInPDFValue}")]
-    public IActionResult GetSessionDetails(string sessionInPDFValue)
+    public async Task<IActionResult> GetSessionDetails(string sessionInPDFValue)
     {
         if (sessionInPDFValue != null)
         {
@@ -253,7 +253,7 @@ public class SessionController : Controller
     ///StatusCode 204.
     ///</returns>
     [HttpGet]
-    public IActionResult SetColorsRandomly()
+    public async Task<IActionResult> SetColorsRandomly()
     {
         var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name).ToList();
         int colorId = 1;
@@ -272,7 +272,7 @@ public class SessionController : Controller
     /// </summary>
     /// <returns>StatusCode 200 with a ModulesColorsViewModel object containing lists of ModuleColor and Color objects</returns>
     [HttpGet]
-    public IActionResult GetModulesWithColors()
+    public async Task<IActionResult> GetModulesWithColors()
     {
         var colors = _repository.Color.FindAll();
         var moduleColors = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name);
@@ -300,7 +300,7 @@ public class SessionController : Controller
     ///<item>StatusCode 400 if the model is invalid.</item>
     ///</returns>
     [HttpPost]
-    public IActionResult AddSession([FromBody] AddSessionViewModel model)
+    public async Task<IActionResult> AddSession([FromBody] AddSessionViewModel model)
     {
         if (ModelState.IsValid)
         {
@@ -324,7 +324,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpPost]
-    public IActionResult ConfirmGroup([FromBody] AddSessionViewModel model)
+    public async Task<IActionResult> ConfirmGroup([FromBody] AddSessionViewModel model)
     {
         if (ModelState.IsValid)
         {
@@ -347,7 +347,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpPost]
-    public IActionResult HandleClashes([FromBody] string[] Sessions)
+    public async Task<IActionResult> HandleClashes([FromBody] string[] Sessions)
     {
         RemoveSelectedWhereNecessary("class");
 
@@ -402,7 +402,7 @@ public class SessionController : Controller
     ///</list>
     ///</returns>
     [HttpPost]
-    public IActionResult HandleGroups([FromBody] GroupsViewModel model)
+    public async Task<IActionResult> HandleGroups([FromBody] GroupsViewModel model)
     {
         List<Lecture> grouped = processor.GetGroupedLectures();
         List<string> sessions = new List<string>(model.Sessions);
@@ -484,7 +484,7 @@ public class SessionController : Controller
     /// </list>
     ///</returns>
     [HttpPost]
-    public IActionResult UpdateModuleColor([FromBody]SessionModuleColorsUpdate model)
+    public async Task<IActionResult> UpdateModuleColor([FromBody]SessionModuleColorsUpdate model)
     {
         try
         {
@@ -525,7 +525,7 @@ public class SessionController : Controller
     ///StatusCode 200 after the module has been deleted.
     ///</returns>
     [HttpDelete("{moduleCode}")]
-    public IActionResult DeleteModule(string moduleCode)
+    public async Task<IActionResult> DeleteModule(string moduleCode)
     {
         int moduleIndex = table.TimetableText.IndexOf(moduleCode);
         if (moduleIndex != -1)
@@ -557,7 +557,7 @@ public class SessionController : Controller
     ///StatusCode 200 after the session is deleted.
     ///</returns>
     [HttpDelete("{session}")]
-    public IActionResult DeleteSession(string session)
+    public async Task<IActionResult> DeleteSession(string session)
     {
         if (session != null)
         {

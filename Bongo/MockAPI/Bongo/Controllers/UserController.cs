@@ -1,5 +1,5 @@
 ﻿using Bongo.MockAPI.Bongo.Infrastructure;
-using Bongo.Models;
+using Bongo.MockAPI.Bongo.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

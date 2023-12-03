@@ -23,7 +23,7 @@ namespace Bongo.Areas.TimetableArea.Data
         {
             using (HttpContent content = new StringContent(text, Encoding.UTF8, "application/json"))
             {
-                return await Client.PostAsync(new Uri($"{URI}/UploadOrCreate"), content);
+                return await Client.PostAsync(new Uri($"{URI}/UpdateOrCreate"), content);
             }
         }
     }

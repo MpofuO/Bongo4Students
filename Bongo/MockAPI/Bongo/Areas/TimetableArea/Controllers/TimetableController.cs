@@ -31,7 +31,7 @@ public class TimetableController : Controller
     ///</list>
     /// </returns>
     [HttpGet]
-    public IActionResult GetUserTimetable()
+    public async Task<IActionResult> GetUserTimetable()
     {
         var table = _repository.Timetable.GetUserTimetable(User.Identity.Name);
         if (table is not null)
@@ -52,7 +52,7 @@ public class TimetableController : Controller
     ///</list>
     ///</returns>
     [HttpGet]
-    public IActionResult ClearUserTable(int id)
+    public async Task<IActionResult> ClearUserTable(int id)
     {
         Timetable table = _repository.Timetable.GetUserTimetable(User.Identity.Name);
         var moduleColor = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name);
@@ -102,7 +102,7 @@ public class TimetableController : Controller
     ///</list>
     /// </returns>
     [HttpPost]
-    public IActionResult UpdateOrCreate(string text)
+    public async Task<IActionResult> UpdateOrCreate(string text)
     {
         //Remove unwanted text
         Regex patternTop = new Regex(@"(\d{4}) CLASS TIMETABLE\n(\d{10})");
