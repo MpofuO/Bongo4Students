@@ -2,11 +2,8 @@
 using Bongo.Areas.TimetableArea.Models;
 using Bongo.Areas.TimetableArea.Models.ViewModels;
 using Bongo.Data;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Text.RegularExpressions;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
@@ -40,7 +37,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             {
                 var groups = await response.Content.ReadFromJsonAsync<List<Lecture>>();
                 if (groups.Count > 0)
-                    return View("Groups", groups);
+                    return View("Groups", new GroupsViewModel { GroupedLectures = groups });
             }
 
             return RedirectToAction("Display", "Timetable");
@@ -192,7 +189,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
             return View(new ModulesColorsViewModel()
             {
-                ModuleColors = moduleColors.Where(m => Request.Cookies["isForFirstSemester"] == "true" ? 
+                ModuleColors = moduleColors.Where(m => Request.Cookies["isForFirstSemester"] == "true" ?
                  (int.Parse(m.ModuleCode.Substring(6, 1)) == 0 || int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 1)
                                 : int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 0),
                 Colors = colors

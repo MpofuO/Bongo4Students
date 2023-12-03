@@ -76,13 +76,13 @@
         </nav>
         <div class="container-md pt-3">
             <div class="d-flex mt-4">
-                @if (activeController == "Merger" || activeController == "Session")
+                @if (activeController == "Timetable" || activeController == "Session")
                 {
                     <div class="d-flex flex-column flex-shrink-0 bg-light rounded-3 shadow side-bar" style="height:fit-content;">
                         <ul class="nav nav-xs-tabs nav-pills flex-column text-dark">
                             <li class="nav-item mt-3">
                                 <a asp-action="Display" asp-controller="Timetable" class="nav-link sidebar-nav-link text-dark @disableLink
-                                        @(activeAction == "Display" && activeController=="Merger" ? "active" : "")">
+                                        @(activeAction == "Display" && activeController=="Timetable" ? "active" : "")">
                                     <i class="fa-solid fa-home me-2"></i><span>View table</span>
                                 </a>
                             </li>
@@ -109,7 +109,7 @@
                             </li>
                             <li class="mt-3 mb-2">
                                 <a asp-controller="Timetable" asp-action="Print" asp-route-latestPeriod="@Context.Request.Cookies["latestPeriod"]"
-                                   class="nav-link sidebar-nav-link text-dark @disableLink @(activeAction == "GeneratePdf" && activeController=="Home" ? "active" : "")" target=" _blank">
+                                   class="nav-link sidebar-nav-link text-dark @disableLink @(activeAction == "GeneratePdf" && activeController=="Home" ? "active" : "")" target="_blank">
                                     <i class="fa-solid fa-download me-2"></i><span>Download</span>
                                 </a>
                             </li>

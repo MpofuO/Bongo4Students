@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bongo.MockAPI.Bongo.Areas.TimetableArea.Controllers;
 
 [Authorize]
-public class MockAPIMergerController : Controller
+public class MockAPIMergerController : ControllerBase
 {
     #region Properties
     private static IRepositoryWrapper repository;
@@ -47,9 +47,9 @@ public class MockAPIMergerController : Controller
     {
         _isForFirstSemester = isForFirstSemester;
         mergedUsers = new();
-        var timetabe = repository.Timetable.GetUserTimetable(User.Identity.Name);
+        var timetabe = repository.Timetable.GetUserTimetable(UserIdentity.Name);
         if (timetabe != null)
-            return await AddUserTimetable(User.Identity.Name);
+            return await AddUserTimetable(UserIdentity.Name);
 
         return NotFound("Please create your timetable before you can merge with others.");
     }
@@ -59,7 +59,7 @@ public class MockAPIMergerController : Controller
             .Select(user => new KeyValuePair<string, string>(user.UserName, user.MergeKey));
 
         var users = new Dictionary<string, string>(usersKeyValuePairs);
-        users.Remove(User.Identity.Name);
+        users.Remove(UserIdentity.Name);
 
         return StatusCode(202, new MergerIndexViewModel
         {
@@ -104,7 +104,7 @@ public class MockAPIMergerController : Controller
 
                 if (clashes.Count > 0 || groups.Count > 0)
                 {
-                    if (username == User.Identity.Name)
+                    if (username == UserIdentity.Name)
                     {
                         return BadRequest("Please ensure that you have managed your clashes and/groups before merging with others.");
                     }

@@ -1,10 +1,6 @@
 ﻿using Bongo.Areas.TimetableArea.Infrastructure;
-using Bongo.Areas.TimetableArea.Models;
 using Bongo.Areas.TimetableArea.Models.ViewModels;
 using Bongo.Data;
-using Bongo.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Areas.TimetableArea.Controllers
@@ -21,12 +17,14 @@ namespace Bongo.Areas.TimetableArea.Controllers
         }
 
         [MyAuthorize]
+        [HttpGet]
         public IActionResult ChooseSemester()
         {
             return View();
         }
 
         [MyAuthorize]
+        [HttpGet]
         public async Task<IActionResult> SetSemester(bool isForFirstSemester)
         {
             _isForFirstSemester = isForFirstSemester;
@@ -47,17 +45,25 @@ namespace Bongo.Areas.TimetableArea.Controllers
             }
 
         valid:
-            viewModel = await response.Content.ReadFromJsonAsync<MergerIndexViewModel>();
+            var apiViewModel = await response.Content.ReadFromJsonAsync<APIMergerIndexViewModel>();
+            viewModel = new MergerIndexViewModel
+            {
+                MergedUsers = apiViewModel.MergedUsers,
+                Users = apiViewModel.Users,
+                Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions)
+            };
             return RedirectToAction("Index");
         }
 
         [MyAuthorize]
+        [HttpGet]
         public IActionResult Index()
         {
             return View(viewModel);
         }
 
         [MyAuthorize]
+        [HttpGet]
         public async Task<IActionResult> AddUserTimetable(string username)
         {
             var response = await wrapper.Merger.AddUserTimetable(username);
@@ -70,6 +76,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
         }
 
         [MyAuthorize]
+        [HttpGet]
         public async Task<IActionResult> RemoveUserTimetable(string username)
         {
             var response = await wrapper.Merger.RemoveUserTimetable(username);

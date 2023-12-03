@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace Bongo.MockAPI.Bongo.Controllers
 {
-    public class MockAPIAccountController : Controller
+    public class MockAPIAccountController : ControllerBase
     {
         private readonly UserManager<BongoUser> _userManager;
         private readonly SignInManager<BongoUser> _signInManager;
@@ -33,6 +33,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                 if (result.Succeeded)
                 {
                     user.Token = GenerateToken(user, model.RememberMe);
+                    UserIdentity.Name = user.UserName;
                     return Ok(user.DecryptUser());
                 }
             }
@@ -43,7 +44,8 @@ namespace Bongo.MockAPI.Bongo.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return NoContent();
+            UserIdentity.Name = "";
+            return StatusCode(204, "User signed out.");
         }
         private string GenerateToken(BongoUser user, bool isPersistent)
         {
@@ -110,7 +112,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                          };
  */
                         //await _mailSender.SendMailAsync(registerModel.Email, "Welcome to Bongo", "WelcomeEmail", emailOptions);
-                        return Ok();
+                        return Ok("Successfully registered.");
                     }
                     catch (Exception)
                     {
@@ -123,7 +125,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                 }
 
             }
-            return BadRequest();
+            return BadRequest("Invalid model.");
         }
 
         //[HttpGet]
@@ -168,9 +170,10 @@ namespace Bongo.MockAPI.Bongo.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(Encryption.Encrypt(email));
                 if (user != null)
-                    return Ok();
+                    return Ok($"User with email {email} exists");
+                return NotFound($"No user with {email} was found.");
             }
-            return NotFound();
+            return BadRequest("Invalid email.");
         }
 
         [HttpPost("ForgotPassword")]
@@ -202,16 +205,16 @@ namespace Bongo.MockAPI.Bongo.Controllers
             {
 
                 if (!(fromForgot && user.SecurityAnswer == Encryption.Encrypt(secAnswer)))
-                    return BadRequest();
+                    return BadRequest("Incorrect answer to question.");
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 return Ok(new string[] { token, user.Id });
             }
-            return NotFound();
+            return NotFound($"User with id {userId} does not exist.");
         }
         [HttpPost("ResetPassword")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword([FromBody]ResetPassword model)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPassword model)
         {
             if (ModelState.IsValid)
             {
@@ -221,7 +224,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
                     var result = await _userManager.ResetPasswordAsync(user, model.Token, model.ConfirmPassword);
                     if (result.Succeeded)
                     {
-                        return Ok();
+                        return Ok("Password reset");
                     }
                     return StatusCode(406, result.Errors);
                 }
@@ -230,21 +233,22 @@ namespace Bongo.MockAPI.Bongo.Controllers
         }
 
         [HttpPost("UpdateSecurityQuestion")]
+        [MyAuthorize]
         public async Task<IActionResult> UpdateSecurityQuestion([FromBody] SecurityQuestionViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+                var user = await _userManager.FindByNameAsync(UserIdentity.Name);
                 if (user is null)
-                    return NotFound();
+                    return NotFound("User does not exist.");
 
                 user.SecurityQuestion = Encryption.Encrypt(model.SecurityQuestion);
                 user.SecurityAnswer = Encryption.Encrypt(model.SecurityAnswer);
                 await _userManager.UpdateAsync(user);
 
-                return Ok();
+                return Ok("Security question and/or answer updated.");
             }
-            return BadRequest();
+            return BadRequest("Invalid model.");
         }
     }
 }

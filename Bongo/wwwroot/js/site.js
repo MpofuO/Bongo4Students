@@ -161,7 +161,7 @@ function TestKey() {
     if (key.value == expectedKeyValue) {
         submit.className = 'btn btn-success mx-2'
         warningDiv.hidden = true;
-        submit.href = 'AddUserTimetable?username=' + mergingWith;
+        submit.href = '/Merger/AddUserTimetable?username=' + mergingWith;
     }
     else {
         submit.className = 'btn disabled';

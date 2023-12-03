@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 namespace Bongo.MockAPI.Bongo.Areas.TimetableArea.Controllers;
 
 [Authorize]
-public class MockAPISessionController : Controller
+public class MockAPISessionController : ControllerBase
 {
     #region Properties
     private static IRepositoryWrapper _repository;
@@ -29,7 +29,7 @@ public class MockAPISessionController : Controller
     #region PrivateMethods
     private bool Initialise()
     {
-        table = _repository.Timetable.GetUserTimetable(User.Identity.Name);
+        table = _repository.Timetable.GetUserTimetable(UserIdentity.Name);
         if (table is not null)
         {
             processor = new TimetableProcessor(table.TimetableText, _isForFirstSemester);
@@ -118,7 +118,7 @@ public class MockAPISessionController : Controller
             _repository.ModuleColor.Create(new ModuleColor
             {
                 ColorId = _repository.Color.GetByName("no-color").ColorId,
-                Username = User.Identity.Name,
+                Username = UserIdentity.Name,
                 ModuleCode = moduleCode
 
             });
@@ -230,7 +230,7 @@ public class MockAPISessionController : Controller
                         _session = arr[i, j];
 
                         ModuleColor moduleColor = _repository.ModuleColor
-                            .GetModuleColorWithColorDetails(User.Identity.Name, _session.ModuleCode);
+                            .GetModuleColorWithColorDetails(UserIdentity.Name, _session.ModuleCode);
 
                         return Ok(new SessionModuleColorViewModel
                         {
@@ -243,7 +243,7 @@ public class MockAPISessionController : Controller
             }
             return NotFound("Session does not exist");
         }
-        return BadRequest();
+        return BadRequest("No session specified.");
     }
 
     ///<summary>
@@ -255,7 +255,7 @@ public class MockAPISessionController : Controller
     [HttpGet]
     public async Task<IActionResult> SetColorsRandomly()
     {
-        var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name).ToList();
+        var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == UserIdentity.Name).ToList();
         int colorId = 1;
         foreach (var moduleColor in lstModuleColor)
         {
@@ -264,7 +264,7 @@ public class MockAPISessionController : Controller
             colorId = colorId > 14 ? 1 : colorId + 0;
         }
         _repository.SaveChanges();
-        return NoContent();
+        return StatusCode(204, "Changes saved successfully.");
     }
 
     /// <summary>
@@ -275,7 +275,7 @@ public class MockAPISessionController : Controller
     public async Task<IActionResult> GetModulesWithColors()
     {
         var colors = _repository.Color.FindAll();
-        var moduleColors = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name);
+        var moduleColors = _repository.ModuleColor.GetByCondition(m => m.Username == UserIdentity.Name);
         var x = moduleColors.Where(m =>
              _isForFirstSemester ? (int.Parse(m.ModuleCode.Substring(6, 1)) == 0 || int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 1)
                             : int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 0);
@@ -330,7 +330,7 @@ public class MockAPISessionController : Controller
         {
             AddNewSession(model, true);
             UpdateAndSave();
-            return Ok();
+            return Ok("Session added.");
         }
 
         return BadRequest("Model was not valid.");
@@ -388,7 +388,7 @@ public class MockAPISessionController : Controller
         }
         UpdateAndSave();
 
-        return Ok();
+        return Ok("Clashes handled successfully.");
     }
 
     ///<summary>
@@ -469,7 +469,7 @@ public class MockAPISessionController : Controller
             return BadRequest("You have selected clashing sessions. Please ensure you don't select sessions that are clashing with each other or with sessions that are already there.");
         }
 
-        return Ok();
+        return Ok("Groups handled successfully.");
 
     }
 
@@ -541,7 +541,7 @@ public class MockAPISessionController : Controller
             else
                 table.TimetableText = table.TimetableText.Replace(table.TimetableText.Substring(moduleIndex), "");
 
-            var moduleColor = _repository.ModuleColor.FindAll().FirstOrDefault(mc => mc.Username == User.Identity.Name && mc.ModuleCode == moduleCode);
+            var moduleColor = _repository.ModuleColor.FindAll().FirstOrDefault(mc => mc.Username == UserIdentity.Name && mc.ModuleCode == moduleCode);
             _repository.ModuleColor.Delete(moduleColor);
 
             UpdateAndSave();

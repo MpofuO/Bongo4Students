@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace Bongo.MockAPI.Bongo.Areas.TimetableArea.Controllers;
 
 [Authorize]
-public class MockAPITimetableController : Controller
+public class MockAPITimetableController : ControllerBase
 {
     private IRepositoryWrapper _repository;
 
@@ -33,11 +33,11 @@ public class MockAPITimetableController : Controller
     [HttpGet]
     public async Task<IActionResult> GetUserTimetable()
     {
-        var table = _repository.Timetable.GetUserTimetable(User.Identity.Name);
+        var table = _repository.Timetable.GetUserTimetable(UserIdentity.Name);
         if (table is not null)
             return Ok(table);
 
-        return NotFound();
+        return NotFound("User has no timetable.");
     }
 
     ///<summary>
@@ -54,8 +54,8 @@ public class MockAPITimetableController : Controller
     [HttpGet]
     public async Task<IActionResult> ClearUserTable(int id)
     {
-        Timetable table = _repository.Timetable.GetUserTimetable(User.Identity.Name);
-        var moduleColor = _repository.ModuleColor.GetByCondition(m => m.Username == User.Identity.Name);
+        Timetable table = _repository.Timetable.GetUserTimetable(UserIdentity.Name);
+        var moduleColor = _repository.ModuleColor.GetByCondition(m => m.Username == UserIdentity.Name);
         if (table != null)
         {
             try
@@ -77,7 +77,7 @@ public class MockAPITimetableController : Controller
                 }
                 _repository.SaveChanges();
 
-                return NoContent();
+                return StatusCode(204,"Timetable successfully cleared.");
             }
             catch
             {
@@ -112,9 +112,9 @@ public class MockAPITimetableController : Controller
             Regex pattern = new Regex(@"205 Nelson Mandela Drive  \|  Park West, Bloemfontein 9301 \| South Africa\nP\.O\. Box 339  \|  Bloemfontein 9300  \|  South Africa \| www\.ufs\.ac\.za|\nVenue Start End Day From To|Venue Start End Day From To\n");//|\(Group [A-Z]{1,2}\)|
             text = pattern.Replace(text, String.Empty);
 
-            Timetable newTimetable = _repository.Timetable.GetUserTimetable(User.Identity.Name) ?? new Timetable { TimetableText = text, Username = User.Identity.Name };
+            Timetable newTimetable = _repository.Timetable.GetUserTimetable(UserIdentity.Name) ?? new Timetable { TimetableText = text, Username = User.Identity.Name };
             _repository.Timetable.Update(newTimetable);
-            SessionControlHelpers.AddNewUserModuleColor(ref _repository, User.Identity.Name, newTimetable.TimetableText);
+            SessionControlHelpers.AddNewUserModuleColor(ref _repository, UserIdentity.Name, newTimetable.TimetableText);
             _repository.SaveChanges();
 
             return Ok("Timetable created/updated successfully");

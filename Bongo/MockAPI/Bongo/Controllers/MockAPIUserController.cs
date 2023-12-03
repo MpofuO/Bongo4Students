@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bongo.MockAPI.Bongo.Controllers
 {
     [Authorize]
-    public class MockAPIUserController : Controller
+    public class MockAPIUserController : ControllerBase
     {
         private readonly UserManager<BongoUser> userManager;
 
@@ -22,24 +22,28 @@ namespace Bongo.MockAPI.Bongo.Controllers
         {
             var result = await userManager.CreateAsync(user.EncryptUser());
             if (result.Succeeded)
-                return Ok();
-            return BadRequest();
+                return Ok("User created successfully.");
+            return BadRequest("User not created successfully.");
         }
+
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] BongoUser user)
         {
             var result = await userManager.UpdateAsync(user.EncryptUser());
             if (result.Succeeded)
-                return Ok();
-            return BadRequest();
+                return Ok("User updated successfully.");
+            return BadRequest("User not updated successfully.");
         }
+
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> Delete([FromBody] BongoUser user)
         {
             var result = await userManager.DeleteAsync(user.EncryptUser());
             if (result.Succeeded)
-                return Ok();
-            return BadRequest();
+                return Ok("User deleted successfully.");
+            return BadRequest("User not deleted successfully.");
         }
     }
 }

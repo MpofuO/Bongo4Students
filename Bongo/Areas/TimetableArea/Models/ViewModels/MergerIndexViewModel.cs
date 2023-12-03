@@ -1,9 +1,13 @@
 ﻿namespace Bongo.Areas.TimetableArea.Models.ViewModels
 {
-    public class MergerIndexViewModel
+    public abstract class AbstractMergerIndexViewModel
     {
-        public Dictionary<string,string> Users { get; set; }
+        public Dictionary<string, string> Users { get; set; }
         public List<string> MergedUsers { get; set; }
+
+    }
+    public class MergerIndexViewModel : AbstractMergerIndexViewModel
+    {
         public Session[,] Sessions { get; set; }
         public int latestPeriod
         {
@@ -21,4 +25,10 @@
             }
         }
     }
+    public class APIMergerIndexViewModel : AbstractMergerIndexViewModel
+    {
+        public List<Session> Sessions { get; set; }
+    }
+
+
 }

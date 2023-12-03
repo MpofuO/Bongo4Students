@@ -15,6 +15,11 @@ namespace Bongo.MockAPI
         public static IApplicationBuilder app;
     }
 
+    public static class UserIdentity
+    {
+        public static string Name { get; set; }
+    }
+
     public class MockHttpClient
     {
         private MockAPIAccountController account;
@@ -60,17 +65,17 @@ namespace Bongo.MockAPI
         {
             string url = uri.ToString();
             if (url.Contains("/authorization/"))
-                HandleOnAccount(url, default);
+                HandleOnAccount(url, content);
             else if (url.Contains("/User/"))
-                HandleOnUser(url, default);
+                HandleOnUser(url, content);
             else if (url.Contains("/Color/"))
-                HandleOnColor(url, default);
+                HandleOnColor(url, content);
             else if (url.Contains("/Merger/"))
-                HandleOnMerger(url, default);
+                HandleOnMerger(url, content);
             else if (url.Contains("/Session/"))
-                HandleOnSession(url, default);
+                HandleOnSession(url, content);
             else
-                HandleOnTimetable(url, default);
+                HandleOnTimetable(url, content);
 
             var objectResult = (ObjectResult)await result;
 

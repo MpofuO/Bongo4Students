@@ -71,7 +71,7 @@
                                 continue;
                             }
 
-                            <td class="period-button table-cell" module-color="@session.ModuleCode" module-color-username="@User.Identity.Name"
+                            <td class="period-button table-cell" module-color="@session.ModuleCode" module-color-username="@Current.User.UserName"
                                 id="col @j" rowspan="@row">
                                 <span class="fw-bold">@(session.ModuleCode.ToLower().Contains("cccc") ? "CLASH!!" : session.ModuleCode)</span> <br />
                                 <span class="hide-venue" style="display:none; font-size:12px">@groupPattern.Replace(session.Venue, "")</span>
