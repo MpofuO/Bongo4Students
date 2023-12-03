@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [MyAuthorize]
     [Area("TimetableArea")]
     public class SessionController : Controller
     {
@@ -21,6 +20,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             wrapper = _wrapper;
         }
 
+        [MyAuthorize]
         public async Task<IActionResult> Manage()
         {
             bool isForFirstSemester = Request.Cookies["isForFirstSemester"] == "true";
@@ -45,6 +45,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
             return RedirectToAction("Display", "Timetable");
         }
+
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> Clashes(string[] Sessions)
         {
@@ -57,6 +59,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return RedirectToAction("Manage");
         }
 
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> Groups(GroupsViewModel model)
         {
@@ -77,6 +80,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
                 Content.ReadFromJsonAsync<ModulesColorsViewModel>());
         }
 
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> DeleteModule(string ModuleCode)
         {
@@ -84,6 +88,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
             TempData["Message"] = "Module removed successfuly.";
             return RedirectToAction("ManageModules");
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> EditClashes()
         {
             var response = await wrapper.Session.GetClashes();
@@ -92,6 +98,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return View("Clashes", clashes);
 
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> EditGroups(bool firstSemester)
         {
             var response = await wrapper.Session.GetGroups();
@@ -99,6 +107,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
             return View("Groups", groups);
         }
+
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> DeleteSession(string session)
         {
@@ -107,6 +117,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return RedirectToAction("Manage");
         }
 
+        [MyAuthorize]
         [HttpGet]
         public async Task<IActionResult> AddSession(string day, string time, string moduleCode = "", string Venue = "")
         {
@@ -114,6 +125,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return View(new AddSessionViewModel { ModuleCode = moduleCode, Venue = Venue, Day = day, startTime = time });
         }
 
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> AddSession(AddSessionViewModel model)
         {
@@ -132,6 +144,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             }
         }
 
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> ConfirmGroup(AddSessionViewModel model)
         {
@@ -144,6 +157,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return View("AddSession", model);
         }
 
+        [MyAuthorize]
         [HttpGet]
         public async Task<IActionResult> SessionDetails(string session)
         {
@@ -155,6 +169,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return RedirectToAction("Display", "Timetable");
         }
 
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> UpdateModuleColor(SessionModuleColorsUpdate model)
         {
@@ -163,6 +178,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return RedirectToAction("Display", "Timetable");
         }
 
+        [MyAuthorize]
         [HttpGet]
         public async Task<IActionResult> EditColors()
         {
@@ -183,6 +199,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             });
         }
 
+        [MyAuthorize]
         [HttpGet]
         public async Task<IActionResult> RandomColorEdit(string activeAction)
         {

@@ -2,13 +2,10 @@
 using Bongo.Areas.TimetableArea.Models;
 using Bongo.Areas.TimetableArea.Models.ViewModels;
 using Bongo.Data;
-using Bongo.Models;
-using Bongo.Services;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Syncfusion.Drawing;
 using Syncfusion.Pdf;
@@ -20,19 +17,14 @@ using PdfPage = Syncfusion.Pdf.PdfPage;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [MyAuthorize]
     [Area("TimetableArea")]
     public class TimetableController : Controller
     {
         private IEndpointWrapper wrapper;
-        private readonly IMailService _mailSender;
-        private readonly UserManager<BongoUser> _userManager;
 
-        public TimetableController(IEndpointWrapper _wrapper, IMailService mailSender, UserManager<BongoUser> userManager)
+        public TimetableController(IEndpointWrapper _wrapper)
         {
             wrapper = _wrapper;
-            _mailSender = mailSender;
-            _userManager = userManager;
         }
 
         #region Hepler Methods
@@ -52,6 +44,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
         #endregion
 
         [HttpGet]
+        [MyAuthorize]
         public async Task<IActionResult> Display(int latestPeriod = 0)
         {
 
@@ -90,12 +83,15 @@ namespace Bongo.Areas.TimetableArea.Controllers
             SetCookie("latestPeriod", indexViewModel.latestPeriod.ToString());
             return View(indexViewModel);
         }
+
+        [MyAuthorize]
         public IActionResult Upload()
         {
             return View();
         }
 
         [HttpPost]
+        [MyAuthorize]
         public async Task<IActionResult> Upload(IFormFile file, string[] startBlank, bool isFirstSemester = true)
         {
             if (file != null)
@@ -165,6 +161,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             return View();
         }
         [HttpPost]
+        [MyAuthorize]
         public async Task<IActionResult> ClearTable(int id)
         {
             await wrapper.Timetable.ClearUserTable(id);
@@ -383,12 +380,14 @@ namespace Bongo.Areas.TimetableArea.Controllers
         }
 
         [HttpPost]
+        [MyAuthorize]
         public IActionResult AddRow(int latestPeriod)
         {
             return RedirectToAction("Display", new { latestPeriod = latestPeriod });
         }
 
         [HttpPost]
+        [MyAuthorize]
         public IActionResult UpdateCookie(string key, string value)
         {
             Response.Cookies.Delete(key);

@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 public class MyAuthorize : Attribute, IAuthorizationFilter
 {
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         if (!IsAuthorized(context))
         {
-            context.Result = new ForbidResult();
+            context.Result = new RedirectResult("/Account/Login", true);
         }
     }
     private bool IsAuthorized(AuthorizationFilterContext context)

@@ -9,23 +9,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Areas.TimetableArea.Controllers
 {
-    [MyAuthorize]
     [Area("TimetableArea")]
     public class MergerController : Controller
     {
         private static IEndpointWrapper wrapper;
-        private static UserManager<BongoUser> userManager;
         private static MergerIndexViewModel viewModel;
         private static bool _isForFirstSemester;
-        public MergerController(IEndpointWrapper _wrapper, UserManager<BongoUser> _userManager)
+        public MergerController(IEndpointWrapper _wrapper)
         {
             wrapper = _wrapper;
-            userManager = _userManager;
         }
+
+        [MyAuthorize]
         public IActionResult ChooseSemester()
         {
             return View();
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> SetSemester(bool isForFirstSemester)
         {
             _isForFirstSemester = isForFirstSemester;
@@ -49,10 +50,14 @@ namespace Bongo.Areas.TimetableArea.Controllers
             viewModel = await response.Content.ReadFromJsonAsync<MergerIndexViewModel>();
             return RedirectToAction("Index");
         }
+
+        [MyAuthorize]
         public IActionResult Index()
         {
             return View(viewModel);
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> AddUserTimetable(string username)
         {
             var response = await wrapper.Merger.AddUserTimetable(username);
@@ -63,6 +68,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> RemoveUserTimetable(string username)
         {
             var response = await wrapper.Merger.RemoveUserTimetable(username);

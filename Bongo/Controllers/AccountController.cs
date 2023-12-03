@@ -1,14 +1,12 @@
 ﻿using Bongo.Data;
 using Bongo.Models;
 using Bongo.Models.ViewModels;
-using Bongo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Controllers
 {
-    [MyAuthorize]
     public class AccountController : Controller
     {
         private readonly IEndpointWrapper _wrapper;
@@ -209,6 +207,7 @@ namespace Bongo.Controllers
             return View(model);
         }
 
+        [MyAuthorize]
         public IActionResult SecurityQuestion(string sendingAction)
         {
             return View(new SecurityQuestionViewModel { SendingAction = sendingAction });
@@ -242,6 +241,8 @@ namespace Bongo.Controllers
         onModelError:
             return View(model);
         }
+
+        [MyAuthorize]
         public async Task<IActionResult> Logout()
         {
             //Logout from the API
@@ -251,13 +252,8 @@ namespace Bongo.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [MyAuthorize]
         public IActionResult MergeKey()
-        {
-            return View();
-        }
-
-        [AllowAnonymous]
-        public IActionResult AccessDenied()
         {
             return View();
         }

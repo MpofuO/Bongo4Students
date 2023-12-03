@@ -58,7 +58,7 @@
                             <a asp-action="Index" asp-controller="Home" class="nav-link me-1">HOME</a>
                         </li>
                     }
-                    @if (User.Identity.IsAuthenticated && activeController == "Home" && activeAction != "Profile")
+                    @if (Current.IsAuthenticated && activeController == "Home" && activeAction != "Profile")
                     {
                         <li class="nav-item">
                             <a asp-action="Profile" class="nav-link me-1">MY PROFILE</a>
@@ -72,7 +72,7 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mt-2 mt-lg-1">
-                    @if (!User.Identity.IsAuthenticated)
+                    @if (!Current.IsAuthenticated)
                     {
                         <li class="nav-item">
                             <a id="openSignInModalButton" asp-controller="Account" asp-action="SignIn"

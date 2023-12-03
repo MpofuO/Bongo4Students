@@ -17,11 +17,7 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.AreaViewLocationFormats.Add("/Areas/{2}/Views/Shared/{0}.cshtml");
     options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
 });
-
-builder.Services.AddControllersWithViews(options =>
-{
-    options.Filters.Add(typeof(MyAuthorize));
-});
+builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IEndpointWrapper, EndpointWrapper>();
 builder.Services.AddTransient<IMailService, MailService>();
 
@@ -60,7 +56,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
       name: "areas",
-      pattern: "{area:exists}/{controller=Merger}/{action=Display}/{id?}"
+      pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
 app.MapControllerRoute(
     name: "default",

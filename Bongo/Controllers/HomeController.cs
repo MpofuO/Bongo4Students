@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bongo.Controllers
 {
-    [MyAuthorize]
     public class HomeController : Controller
     {
         private readonly IEndpointWrapper wrapper;
@@ -30,6 +29,8 @@ namespace Bongo.Controllers
 
             return View();
         }
+
+        [MyAuthorize]
         [HttpPost]
         public async Task<IActionResult> Notice()
         {
@@ -41,10 +42,14 @@ namespace Bongo.Controllers
                             );
             return RedirectToAction("Index");
         }
+
+        [MyAuthorize]
         public IActionResult Profile()
         {
             return View(Current.User);
         }
+
+        [MyAuthorize]
         [HttpPost]
         [ActionName("Profile")]
         public async Task<IActionResult> UpdateProfile(string id, string action, string newValue)

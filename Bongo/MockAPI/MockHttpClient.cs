@@ -6,7 +6,6 @@ using Bongo.MockAPI.Bongo.Models;
 using Bongo.MockAPI.Bongo.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Eventing.Reader;
 using System.Net;
 
 namespace Bongo.MockAPI
@@ -18,12 +17,12 @@ namespace Bongo.MockAPI
 
     public class MockHttpClient
     {
-        private AccountController account;
-        private UserController user;
-        private ColorController color;
-        private MergerController merger;
-        private SessionController session;
-        private TimetableController timetable;
+        private MockAPIAccountController account;
+        private MockAPIUserController user;
+        private MockAPIColorController color;
+        private MockAPIMergerController merger;
+        private MockAPISessionController session;
+        private MockAPITimetableController timetable;
 
         private Task<IActionResult> result;
 
@@ -40,12 +39,12 @@ namespace Bongo.MockAPI
 
             IRepositoryWrapper repo = new RepositoryWrapper(context);
 
-            account = new AccountController(userManager, signInManager, config);
-            user = new UserController(userManager);
-            color = new ColorController(repo);
-            merger = new MergerController(repo, userManager);
-            session = new SessionController(repo);
-            timetable = new TimetableController(repo, userManager);
+            account = new MockAPIAccountController(userManager, signInManager, config);
+            user = new MockAPIUserController(userManager);
+            color = new MockAPIColorController(repo);
+            merger = new MockAPIMergerController(repo, userManager);
+            session = new MockAPISessionController(repo);
+            timetable = new MockAPITimetableController(repo, userManager);
         }
 
         public async Task<HttpResponseMessage> GetAsync(Uri uri)
