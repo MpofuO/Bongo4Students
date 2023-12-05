@@ -1,6 +1,7 @@
 # Bongo4Students
 The upgraded version of Bongo that uses the BongoAPI and has additional functionality and better UI. Please go to https://github.com/MpofuO/PublishedBongo/blob/main/README.md to access the readme of the version directly before this one.
 
+
 ## New Feature Goals
 The following are the sections of the goals that this version of Bongo aims to achieve:
 
@@ -20,10 +21,13 @@ The following are the sections of the goals that this version of Bongo aims to a
 - Bongo now uses a custom authentication class to authenticate users as it does not sign in the user due to the complete disconnection from the database.
 
 
+
 ## Important Note
 Please note the following regarding the current status of Bongo:
 - We are currently working on successfully using JwtAthentication Tokens. For the time, The API has been embedded into tha application for testing the application.
 - We are also working on custon user authentication. For the time, this does not work and is being dealt with. Discarding the authentication may be an option to consider in order to run the application.
+
+
 
 ## Credits
 Please visit https://github.com/MpofuO/PublishedBongo#collaboration to view collaboration details of this project.  
