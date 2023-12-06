@@ -10,5 +10,7 @@ namespace Bongo.Data
         ISessionEndpoint Session { get; }
         ITimetableEndpoint Timetable { get; }
         IAuthorizationEndpoint Authorization { get; }
+
+        public void Clear();
     }
 }

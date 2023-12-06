@@ -21,11 +21,13 @@ public class MockAPIMergerController : ControllerBase
     private static List<Lecture> groups;
     private static List<string> mergedUsers;
     private static Session[,] mergedSessions;
+    private static string Username;
     #endregion Properties
-    public MockAPIMergerController(IRepositoryWrapper _repository, UserManager<BongoUser> _userManager)
+    public MockAPIMergerController(IRepositoryWrapper _repository, UserManager<BongoUser> _userManager, string username)
     {
         repository = _repository;
         userManager = _userManager;
+        Username = username;
     }
 
     #region GetMethods
@@ -47,9 +49,9 @@ public class MockAPIMergerController : ControllerBase
     {
         _isForFirstSemester = isForFirstSemester;
         mergedUsers = new();
-        var timetabe = repository.Timetable.GetUserTimetable(UserIdentity.Name);
+        var timetabe = repository.Timetable.GetUserTimetable(Username);
         if (timetabe != null)
-            return await AddUserTimetable(UserIdentity.Name);
+            return await AddUserTimetable(Username);
 
         return NotFound("Please create your timetable before you can merge with others.");
     }
@@ -59,7 +61,7 @@ public class MockAPIMergerController : ControllerBase
             .Select(user => new KeyValuePair<string, string>(user.UserName, user.MergeKey));
 
         var users = new Dictionary<string, string>(usersKeyValuePairs);
-        users.Remove(UserIdentity.Name);
+        users.Remove(Username);
 
         return StatusCode(202, new MergerIndexViewModel
         {
@@ -96,6 +98,7 @@ public class MockAPIMergerController : ControllerBase
             {
                 if (timetable.TimetableText == "")
                 {
+                    mergedUsers.Add(username);
                     return StatusCode(204, $"Please note that {username}'s timetable has no sessions, no changes will be seen.");
                 }
 
@@ -104,14 +107,14 @@ public class MockAPIMergerController : ControllerBase
 
                 if (clashes.Count > 0 || groups.Count > 0)
                 {
-                    if (username == UserIdentity.Name)
+                    if (username == Username)
                     {
                         return BadRequest("Please ensure that you have managed your clashes and/groups before merging with others.");
                     }
                     else
                     {
-                        return BadRequest($"Could not merge with {username}'s timetable.\n" +
-                            $"Please ensure that {username} has managed their clashes and/or groups before merging with them.");
+                        return BadRequest($"Could not merge with {username}'s timetable." +
+                            $" Please ensure that {username} has managed their clashes and/or groups before merging with them.");
                     }
                 }
                 if (mergedUsers.Count == 0)
@@ -122,8 +125,7 @@ public class MockAPIMergerController : ControllerBase
                 mergedUsers.Add(username);
                 return GetMerge();
             }
-
-            return NotFound($"Could not merge with {username}'s timetable.\n" +
+            return NotFound($"Could not merge with {username}'s timetable. " +
                             $"Please ensure that {username} has created their timetable before merging with them.");
         }
     }
@@ -152,7 +154,8 @@ public class MockAPIMergerController : ControllerBase
             mergedUsers.Remove(username);
             return GetMerge();
         }
-        return NotFound($"{username}'s timetable was never merged with.");
+        string s = $"{username}'s timetable was never merged with.";
+        return NotFound(s);
     }
     #endregion GetMethods
 }

@@ -9,6 +9,7 @@
     public class MergerIndexViewModel : AbstractMergerIndexViewModel
     {
         public Session[,] Sessions { get; set; }
+        public bool isFirstSemester { get; set; }
         public int latestPeriod
         {
             get

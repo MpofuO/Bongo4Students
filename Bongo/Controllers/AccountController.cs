@@ -4,6 +4,7 @@ using Bongo.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Crypto;
 
 namespace Bongo.Controllers
 {
@@ -44,11 +45,13 @@ namespace Bongo.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var user = await response.Content.ReadFromJsonAsync<BongoUser>();
+
                     Response.Cookies.Append("Notified", user.Notified.ToString().ToLower(),
                         new CookieOptions { Expires = DateTime.Now.AddDays(90) });
-                    Current.User = user;
+                    Response.Cookies.Append("Username", user.UserName,
+                        new CookieOptions { Expires = DateTime.Now.AddDays(loginModel.RememberMe ? 3 : 1) });
 
-                    if (Current.User.SecurityQuestion != default)
+                    if (user.SecurityQuestion != default)
                         return RedirectToAction("Index", "Home");
                     else
                         return RedirectToAction("SecurityQuestion", new { sendingAction = "LogIn" });
@@ -157,20 +160,25 @@ namespace Bongo.Controllers
             return View("AskSecurityQuestion", model);
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> ChangePassword(string userId)
+        [MyAuthorize]
+        public async Task<IActionResult> ChangePassword()
         {
-            var result = await _wrapper.Authorization.ChangePassword(userId);
+            var userResponse = await _wrapper.User.GetUserByName(Request.Cookies["Username"]);
+            var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
+
+            var result = await _wrapper.Authorization.ForgotPassword(new AnswerSecurityQuestionViewModel
+            {
+                SecurityAnswer = user.SecurityAnswer,
+                SecurityQuestion = user.SecurityQuestion,
+                Email = user.Email
+            });
             switch ((int)result.StatusCode)
             {
                 case 200:
                     string[] arr = await result.Content.ReadFromJsonAsync<string[]>();
                     return RedirectToAction("ResetPassword", new { userId = arr[1], token = arr[0] });
                 case 400:
-                    TempData["Message"] = $"Invalid request. You are not authorized to change the password for user with id: {userId}";
-                    break;
-                default:
-                    TempData["Message"] = $"Invalid request. No user with id {userId} was found";
+                    TempData["Message"] = $"Something went wrong.";
                     break;
             }
             return RedirectToAction("Index", "Home");
@@ -247,7 +255,7 @@ namespace Bongo.Controllers
         {
             //Logout from the API
             await _wrapper.Authorization.Logout();
-            Current.User = null;
+            Response.Cookies.Delete("Username");
 
             return RedirectToAction("Index", "Home");
         }

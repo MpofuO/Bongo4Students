@@ -1,4 +1,5 @@
 ﻿using Bongo.Areas.TimetableArea.Data;
+using Bongo.Controllers;
 using System.Net;
 
 namespace Bongo.Data
@@ -6,12 +7,12 @@ namespace Bongo.Data
     public class EndpointWrapper : IEndpointWrapper
     {
         private readonly IHttpContextAccessor context;
-        private IUserEndpoint user;
-        private IColorEndpoint color;
-        private IMergerEndpoint merger;
-        private ISessionEndpoint session;
-        private ITimetableEndpoint timetable;
-        private IAuthorizationEndpoint authorization;
+        private static IUserEndpoint user;
+        private static IColorEndpoint color;
+        private static IMergerEndpoint merger;
+        private static ISessionEndpoint session;
+        private static ITimetableEndpoint timetable;
+        private static IAuthorizationEndpoint authorization;
         public EndpointWrapper(IHttpContextAccessor _context) { context = _context; }
 
         public ITimetableEndpoint Timetable
@@ -41,6 +42,16 @@ namespace Bongo.Data
         public IUserEndpoint User
         {
             get { if (user is null) user = new UserEndpoint(context); return user; }
+        }
+
+        public void Clear()
+        {
+            user = null;
+            color = null;
+            merger = null;
+            timetable = null;
+            session = null;
+            authorization = null;
         }
     }
 }

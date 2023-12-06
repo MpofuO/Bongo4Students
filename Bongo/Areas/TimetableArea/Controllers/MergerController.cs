@@ -50,7 +50,8 @@ namespace Bongo.Areas.TimetableArea.Controllers
             {
                 MergedUsers = apiViewModel.MergedUsers,
                 Users = apiViewModel.Users,
-                Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions)
+                Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions),
+                isFirstSemester = _isForFirstSemester
             };
             return RedirectToAction("Index");
         }
@@ -67,10 +68,23 @@ namespace Bongo.Areas.TimetableArea.Controllers
         public async Task<IActionResult> AddUserTimetable(string username)
         {
             var response = await wrapper.Merger.AddUserTimetable(username);
-            if (response.IsSuccessStatusCode)
-                viewModel = await response.Content.ReadFromJsonAsync<MergerIndexViewModel>();
+            if ((int)response.StatusCode == 202)
+            {
+                var apiViewModel = await response.Content.ReadFromJsonAsync<APIMergerIndexViewModel>();
+                viewModel = new MergerIndexViewModel
+                {
+                    MergedUsers = apiViewModel.MergedUsers,
+                    Users = apiViewModel.Users,
+                    Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions),
+                    isFirstSemester = _isForFirstSemester
+                };
+            }
             else
-                TempData["Message"] = await response.Content.ReadAsStringAsync();
+            {
+                TempData["Message"] = (await response.Content.ReadAsStringAsync()).Replace("\"", "");
+                if ((int)response.StatusCode == 204)
+                    viewModel.MergedUsers.Add(username);
+            }
 
             return RedirectToAction("Index");
         }
@@ -81,7 +95,16 @@ namespace Bongo.Areas.TimetableArea.Controllers
         {
             var response = await wrapper.Merger.RemoveUserTimetable(username);
             if (response.IsSuccessStatusCode)
-                viewModel = await response.Content.ReadFromJsonAsync<MergerIndexViewModel>();
+            {
+                var apiViewModel = await response.Content.ReadFromJsonAsync<APIMergerIndexViewModel>();
+                viewModel = new MergerIndexViewModel
+                {
+                    MergedUsers = apiViewModel.MergedUsers,
+                    Users = apiViewModel.Users,
+                    Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions),
+                    isFirstSemester = _isForFirstSemester
+                };
+            }
             else
                 TempData["Message"] = await response.Content.ReadAsStringAsync();
 

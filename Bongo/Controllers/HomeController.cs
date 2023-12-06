@@ -17,11 +17,14 @@ namespace Bongo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            if (Current.IsAuthenticated)
+            if (Request.Cookies["Username"] is not null)
             {
                 var response = await wrapper.Timetable.GetUserTimetable();
                 TempData["HasTimetable"] = response.IsSuccessStatusCode;
-                if (Current.User.MergeKey == default)
+
+                var userResponse = await wrapper.User.GetUserByName(Request.Cookies["Username"]);
+                var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
+                if (user.MergeKey == default)
                     return RedirectToAction("MergeKey", "Account");
             }
             else
@@ -34,7 +37,8 @@ namespace Bongo.Controllers
         [HttpPost]
         public async Task<IActionResult> Notice()
         {
-            var user = Current.User;
+            var userResponse = await wrapper.User.GetUserByName(Request.Cookies["Username"]);
+            var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
             user.Notified = true;
             await wrapper.User.Update(user);
             Response.Cookies.Append("Notified", user.Notified.ToString().ToLower(),
@@ -44,9 +48,11 @@ namespace Bongo.Controllers
         }
 
         [MyAuthorize]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
-            return View(Current.User);
+            var userResponse = await wrapper.User.GetUserByName(Request.Cookies["Username"]);
+            var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
+            return View(user);
         }
 
         [MyAuthorize]
@@ -54,7 +60,8 @@ namespace Bongo.Controllers
         [ActionName("Profile")]
         public async Task<IActionResult> UpdateProfile(string id, string action, string newValue)
         {
-            var user = Current.User;
+            var userResponse = await wrapper.User.GetUserByName(Request.Cookies["Username"]);
+            var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
 
             switch (id)
             {
@@ -65,7 +72,14 @@ namespace Bongo.Controllers
 
             var result = await wrapper.User.Update(user);
             if (result.IsSuccessStatusCode)
+            {
+                if (id == "username")
+                {
+                    wrapper.Clear();
+                    Response.Cookies.Append("Username", user.UserName);
+                }
                 TempData["Message"] = "Your account detail(s) have successfully been updated";
+            }
             else
                 TempData["Message"] = "Failed to update account detail(s)";
 

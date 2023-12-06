@@ -15,12 +15,15 @@ namespace Bongo.MockAPI.Bongo.Controllers
         private readonly UserManager<BongoUser> _userManager;
         private readonly SignInManager<BongoUser> _signInManager;
         private readonly IConfiguration _config;
+        private readonly string Username;
 
-        public MockAPIAccountController(UserManager<BongoUser> userManager, SignInManager<BongoUser> signInManager, IConfiguration configuration)
+        public MockAPIAccountController(UserManager<BongoUser> userManager, SignInManager<BongoUser> signInManager,
+            IConfiguration configuration, string username)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = configuration;
+            Username = username;
         }
 
         [HttpPost("login")]
@@ -33,7 +36,6 @@ namespace Bongo.MockAPI.Bongo.Controllers
                 if (result.Succeeded)
                 {
                     user.Token = GenerateToken(user, model.RememberMe);
-                    UserIdentity.Name = user.UserName;
                     return Ok(user.DecryptUser());
                 }
             }
@@ -44,7 +46,6 @@ namespace Bongo.MockAPI.Bongo.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            UserIdentity.Name = "";
             return StatusCode(204, "User signed out.");
         }
         private string GenerateToken(BongoUser user, bool isPersistent)
@@ -203,7 +204,6 @@ namespace Bongo.MockAPI.Bongo.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
-
                 if (!(fromForgot && user.SecurityAnswer == Encryption.Encrypt(secAnswer)))
                     return BadRequest("Incorrect answer to question.");
 
@@ -238,7 +238,7 @@ namespace Bongo.MockAPI.Bongo.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(UserIdentity.Name);
+                var user = await _userManager.FindByNameAsync(Username);
                 if (user is null)
                     return NotFound("User does not exist.");
 

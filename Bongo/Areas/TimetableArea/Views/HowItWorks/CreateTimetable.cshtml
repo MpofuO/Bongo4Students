@@ -46,7 +46,7 @@
                 </p>
                 <div class="w-100 text-center mb-4">
                     <a class="btn btn-outline-primary ms-auto"
-                       asp-controller="Session" asp-action="TimeTableFileUpload" style="width: 180px !important;">@(User.Identity.IsAuthenticated ? "Back to Home" : "GetSessionsArray started")</a>
+                       asp-controller="Session" asp-action="TimeTableFileUpload" style="width: 180px !important;">@(UserIdentity.IsAuthenticated ? "Back to Home" : "GetSessionsArray started")</a>
                 </div>
             </div>
             <div class="col-lg-6 top-image">

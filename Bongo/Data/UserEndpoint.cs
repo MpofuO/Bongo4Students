@@ -25,6 +25,11 @@ namespace Bongo.Data
             }
         }
 
+        public async Task<HttpResponseMessage> GetUserByName(string username)
+        {
+            return await Client.GetAsync(new Uri($"{URI}/GetUserByName/{username}"));
+        }
+
         public async Task<HttpResponseMessage> Update(BongoUser user)
         {
             using (HttpContent content = JsonContent.Create(user))

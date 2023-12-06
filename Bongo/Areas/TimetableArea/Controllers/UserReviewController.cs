@@ -24,8 +24,8 @@
 //        [HttpGet]
 //        public IActionResult AddReview()
 //        {
-//            UserReview model = wrapper.UserReview.FindAll().FirstOrDefault(r => r.Username == User.Identity.Name);
-//            return View(model ?? new UserReview { Username = User.Identity.Name});
+//            UserReview model = wrapper.UserReview.FindAll().FirstOrDefault(r => r.Username == Request.Cookies["Username"]);
+//            return View(model ?? new UserReview { Username = Request.Cookies["Username"]});
 //        }
 //        [HttpPost]
 //        public async Task<IActionResult> AddReview(UserReview model)

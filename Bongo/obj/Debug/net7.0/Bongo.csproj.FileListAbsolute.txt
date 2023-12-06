@@ -204,3 +204,4 @@ C:\Users\20208\source\repos\Bongo4Students\Bongo\obj\Debug\net7.0\refint\Bongo.d
 C:\Users\20208\source\repos\Bongo4Students\Bongo\obj\Debug\net7.0\Bongo.pdb
 C:\Users\20208\source\repos\Bongo4Students\Bongo\obj\Debug\net7.0\Bongo.genruntimeconfig.cache
 C:\Users\20208\source\repos\Bongo4Students\Bongo\obj\Debug\net7.0\ref\Bongo.dll
+C:\Users\20208\source\repos\Bongo4Students\Bongo\obj\Debug\net7.0\Bongo.sourcelink.json

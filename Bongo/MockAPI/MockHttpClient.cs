@@ -15,11 +15,6 @@ namespace Bongo.MockAPI
         public static IApplicationBuilder app;
     }
 
-    public static class UserIdentity
-    {
-        public static string Name { get; set; }
-    }
-
     public class MockHttpClient
     {
         private MockAPIAccountController account;
@@ -31,7 +26,7 @@ namespace Bongo.MockAPI
 
         private Task<IActionResult> result;
 
-        public MockHttpClient()
+        public MockHttpClient(string username)
         {
             AppDbContext context = Global.app.ApplicationServices
                 .CreateScope().ServiceProvider.GetRequiredService<AppDbContext>();
@@ -44,12 +39,12 @@ namespace Bongo.MockAPI
 
             IRepositoryWrapper repo = new RepositoryWrapper(context);
 
-            account = new MockAPIAccountController(userManager, signInManager, config);
+            account = new MockAPIAccountController(userManager, signInManager, config, username);
             user = new MockAPIUserController(userManager);
-            color = new MockAPIColorController(repo);
-            merger = new MockAPIMergerController(repo, userManager);
-            session = new MockAPISessionController(repo);
-            timetable = new MockAPITimetableController(repo, userManager);
+            color = new MockAPIColorController(repo, username);
+            merger = new MockAPIMergerController(repo, userManager, username);
+            session = new MockAPISessionController(repo, username);
+            timetable = new MockAPITimetableController(repo, userManager, username);
         }
 
         public async Task<HttpResponseMessage> GetAsync(Uri uri)
@@ -91,7 +86,7 @@ namespace Bongo.MockAPI
         private async void HandleOnAccount(string url, HttpContent content)
         {
             if (url.Contains("ChangePassword"))
-                result = account.ChangePassword(url.Substring(url.LastIndexOf('/')));
+                result = account.ChangePassword(url.Substring(url.LastIndexOf('/') + 1));
             else if (url.Contains("ForgotPassword"))
             {
                 result = account.ForgotPassword(await content.ReadFromJsonAsync<AnswerSecurityQuestionViewModel>());
@@ -117,7 +112,7 @@ namespace Bongo.MockAPI
                 result = account.UpdateSecurityQuestion(await content.ReadFromJsonAsync<SecurityQuestionViewModel>());
             }
             else if (url.Contains("VerifyEmail"))
-                result = account.VerifyEmail(url.Substring(url.LastIndexOf('/')));
+                result = account.VerifyEmail(url.Substring(url.LastIndexOf('/') + 1));
         }
         private async void HandleOnUser(string url, HttpContent content)
         {
@@ -129,15 +124,17 @@ namespace Bongo.MockAPI
             {
                 result = user.Delete(await content.ReadFromJsonAsync<BongoUser>());
             }
-            else
+            else if (url.Contains("Update"))
             {
                 result = user.Update(await content.ReadFromJsonAsync<BongoUser>());
             }
+            else if(url.Contains("GetUserByName"))
+                result = user.GetUserByName(url.Substring(url.LastIndexOf('/') + 1));
         }
         private void HandleOnColor(string url, HttpContent content)
         {
             if (url.Contains("GetModuleColorWithColorDetails"))
-                result = color.GetModuleColorWithColorDetails(url.Substring(url.LastIndexOf('/')));
+                result = color.GetModuleColorWithColorDetails(url.Substring(url.LastIndexOf('/') + 1));
             else if (url.Contains("GetModulesWithColors"))
                 result = color.GetModulesWithColors();
             else
@@ -146,11 +143,11 @@ namespace Bongo.MockAPI
         private void HandleOnMerger(string url, HttpContent content)
         {
             if (url.Contains("InitialiseMerger"))
-                result = merger.InitialiseMerger(url.Substring(url.LastIndexOf('/')).ToLower() == "true");
+                result = merger.InitialiseMerger(url.Substring(url.LastIndexOf('/') + 1).ToLower() == "true");
             else if (url.Contains("RemoveUserTimetable"))
-                result = merger.RemoveUserTimetable(url.Substring(url.LastIndexOf('/')));
+                result = merger.RemoveUserTimetable(url.Substring(url.LastIndexOf('/') + 1));
             else
-                result = merger.AddUserTimetable(url.Substring(url.LastIndexOf('/')));
+                result = merger.AddUserTimetable(url.Substring(url.LastIndexOf('/') + 1));
         }
         private async void HandleOnSession(string url, HttpContent content)
         {
@@ -159,17 +156,17 @@ namespace Bongo.MockAPI
             else if (url.Contains("ConfirmGroup"))
                 result = session.ConfirmGroup(await content.ReadFromJsonAsync<AddSessionViewModel>());
             else if (url.Contains("DeleteModule"))
-                result = session.DeleteModule(url.Substring(url.LastIndexOf('/')));
+                result = session.DeleteModule(url.Substring(url.LastIndexOf('/') + 1));
             else if (url.Contains("DeleteSession"))
-                result = session.DeleteSession(url.Substring(url.LastIndexOf('/')));
+                result = session.DeleteSession(url.Substring(url.LastIndexOf('/') + 1));
             else if (url.Contains("GetClashes"))
                 result = session.GetClashes();
             else if (url.Contains("GetGroups"))
                 result = session.GetGroups();
             else if (url.Contains("GetSessionDetails"))
-                result = session.GetSessionDetails(url.Substring(url.LastIndexOf('/')));
+                result = session.GetSessionDetails(url.Substring(url.LastIndexOf('/') + 1));
             else if (url.Contains("GetTimetableSessions"))
-                result = session.GetTimetableSessions(url.Substring(url.LastIndexOf('/')).ToLower() == "true");
+                result = session.GetTimetableSessions(url.Substring(url.LastIndexOf('/') + 1).ToLower() == "true");
             else if (url.Contains("HandleClashes"))
                 result = session.HandleClashes(await content.ReadFromJsonAsync<string[]>());
             else if (url.Contains("HandleGroups"))
@@ -184,7 +181,7 @@ namespace Bongo.MockAPI
             if (url.Contains("GetUserTimetable"))
                 result = timetable.GetUserTimetable();
             else if (url.Contains("ClearUserTable"))
-                result = timetable.ClearUserTable(int.Parse(url.Substring(url.LastIndexOf('/'))));
+                result = timetable.ClearUserTable(int.Parse(url.Substring(url.LastIndexOf('/') + 1)));
             else
                 result = timetable.UpdateOrCreate(await content.ReadAsStringAsync());
         }

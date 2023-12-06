@@ -12,7 +12,7 @@ namespace Bongo.Data
         {
             URI = "https://localhost:7098/";
             //Client = new HttpClient();
-            Client = new MockHttpClient();
+            Client = new MockHttpClient(httpContextAccessor.HttpContext.Request.Cookies["Username"]);
             var httpContext = httpContextAccessor.HttpContext;
             if (httpContext != null)
             {

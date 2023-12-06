@@ -8,9 +8,11 @@ namespace Bongo.MockAPI.Bongo.Areas.TimetableArea.Controllers
     public class MockAPIColorController : ControllerBase
     {
         private static IRepositoryWrapper repository;
-        public MockAPIColorController(IRepositoryWrapper _repository)
+        private static string Username;
+        public MockAPIColorController(IRepositoryWrapper _repository, string username)
         {
             repository = _repository;
+            Username = username;
         }
 
         [HttpGet]
@@ -22,14 +24,14 @@ namespace Bongo.MockAPI.Bongo.Areas.TimetableArea.Controllers
         [HttpGet("{moduleCode}")]
         public async Task<IActionResult> GetModuleColorWithColorDetails(string moduleCode)
         {
-            var moduleColor = repository.ModuleColor.GetModuleColorWithColorDetails(UserIdentity.Name, moduleCode);
+            var moduleColor = repository.ModuleColor.GetModuleColorWithColorDetails(Username, moduleCode);
             return Ok(moduleColor);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetModulesWithColors()
         {
-            return Ok(repository.ModuleColor.GetByCondition(mc => mc.Username == UserIdentity.Name));
+            return Ok(repository.ModuleColor.GetByCondition(mc => mc.Username == Username));
         }
     }
 }

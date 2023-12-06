@@ -19,17 +19,19 @@ public class MockAPISessionController : ControllerBase
     private static TimetableProcessor processor;
     private static Session[,] data;
     private static bool _isForFirstSemester;
+    private readonly string Username;
     #endregion Properties
 
-    public MockAPISessionController(IRepositoryWrapper repository)
+    public MockAPISessionController(IRepositoryWrapper repository, string username)
     {
         _repository = repository;
+        Username = username;
     }
 
     #region PrivateMethods
     private bool Initialise()
     {
-        table = _repository.Timetable.GetUserTimetable(UserIdentity.Name);
+        table = _repository.Timetable.GetUserTimetable(Username);
         if (table is not null)
         {
             processor = new TimetableProcessor(table.TimetableText, _isForFirstSemester);
@@ -118,7 +120,7 @@ public class MockAPISessionController : ControllerBase
             _repository.ModuleColor.Create(new ModuleColor
             {
                 ColorId = _repository.Color.GetByName("no-color").ColorId,
-                Username = UserIdentity.Name,
+                Username = Username,
                 ModuleCode = moduleCode
 
             });
@@ -230,7 +232,7 @@ public class MockAPISessionController : ControllerBase
                         _session = arr[i, j];
 
                         ModuleColor moduleColor = _repository.ModuleColor
-                            .GetModuleColorWithColorDetails(UserIdentity.Name, _session.ModuleCode);
+                            .GetModuleColorWithColorDetails(Username, _session.ModuleCode);
 
                         return Ok(new SessionModuleColorViewModel
                         {
@@ -255,7 +257,7 @@ public class MockAPISessionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> SetColorsRandomly()
     {
-        var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == UserIdentity.Name).ToList();
+        var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == Username).ToList();
         int colorId = 1;
         foreach (var moduleColor in lstModuleColor)
         {
@@ -275,7 +277,7 @@ public class MockAPISessionController : ControllerBase
     public async Task<IActionResult> GetModulesWithColors()
     {
         var colors = _repository.Color.FindAll();
-        var moduleColors = _repository.ModuleColor.GetByCondition(m => m.Username == UserIdentity.Name);
+        var moduleColors = _repository.ModuleColor.GetByCondition(m => m.Username == Username);
         var x = moduleColors.Where(m =>
              _isForFirstSemester ? (int.Parse(m.ModuleCode.Substring(6, 1)) == 0 || int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 1)
                             : int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 0);
@@ -541,7 +543,7 @@ public class MockAPISessionController : ControllerBase
             else
                 table.TimetableText = table.TimetableText.Replace(table.TimetableText.Substring(moduleIndex), "");
 
-            var moduleColor = _repository.ModuleColor.FindAll().FirstOrDefault(mc => mc.Username == UserIdentity.Name && mc.ModuleCode == moduleCode);
+            var moduleColor = _repository.ModuleColor.FindAll().FirstOrDefault(mc => mc.Username == Username && mc.ModuleCode == moduleCode);
             _repository.ModuleColor.Delete(moduleColor);
 
             UpdateAndSave();
