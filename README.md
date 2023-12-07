@@ -30,4 +30,83 @@ Please note the following regarding the current status of Bongo:
 
 
 ## Credits
-Please visit https://github.com/MpofuO/PublishedBongo#collaboration to view collaboration details of this project.  
+Please visit https://github.com/MpofuO/PublishedBongo#collaboration to view collaboration details of this project.
+
+
+
+# How it Works/Looks like
+The following are screenshots of the website's state showing how it works and looks like:
+
+## Basic User Interfaces
+- Homepage of the website:
+  ![Home](Home.png)
+  
+- Group Management:
+  This page is similar to the one of handling clashes
+  ![Management](ManageGroups.png)
+
+## User Account Interfaces
+- Login:
+
+  ![Login](Login.png)
+
+- Register:
+
+  ![Register](Register.png)
+  
+### Resetting Forgot Password
+- Step 1: Verify Email
+
+  ![Verify Email](VerifyEmail.png)
+  
+- Step 2: Verify it's you
+
+  ![Verify It's You](VerifyYourself.png)
+  
+- Step 4: Reset Password
+
+  ![Reset Password](ResetPassword.png)
+
+### Resetting the security question and/or answer
+- The user does gets to this from the profile page:
+
+  ![Security Question](SecurityQuestion.png)
+
+## User Interfaces:
+### Profile
+- The profile page of the user
+
+  ![User Profile](Profile.png)
+  
+### Updating the profile
+- Updating username:
+
+  ![Edit username](EditUsername.png)
+  
+- Updating email:
+
+  ![Edit email](EditEmail.png)
+
+
+## Merging timetable Interfaces:
+The following steps are followed by the user to merge their timetable with others:
+- Step 1: Choose semester to merge for
+
+  ![Choose semester](ChooseSemester.png)
+
+- Step 2: User is presented with their timetable but blacked out
+
+  ![Unmerged timetable](Unmerged.png)
+
+- Step 3: User searches for a user by name and selects user. Merge key is requested
+
+  ![Key Request](MergeKeyRequested.png)
+
+-Step 4: Submit button is enabled only when the correct key is entered
+
+  ![Key Accepted](MergeKeyAccepted.png)
+
+- Step 5: User merges with selected user
+- 
+  ![Merged timetable](Merged.png)
+
