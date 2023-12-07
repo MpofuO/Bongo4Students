@@ -32,10 +32,19 @@ namespace Bongo.Areas.TimetableArea.Controllers
             var response = await wrapper.Merger.InitialiseMerger(_isForFirstSemester);
             switch ((int)response.StatusCode)
             {
-                case 202: goto valid;
+                case 202:
+                    var apiViewModel = await response.Content.ReadFromJsonAsync<APIMergerIndexViewModel>();
+                    viewModel = new MergerIndexViewModel
+                    {
+                        MergedUsers = apiViewModel.MergedUsers,
+                        Users = apiViewModel.Users,
+                        Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions),
+                        isFirstSemester = _isForFirstSemester
+                    };
+                    return RedirectToAction("Index");
                 case 204:
-                    TempData["Message"] = "Note that your timetable has no sessions for the selected semester.";
-                    goto valid;
+                    TempData["Message"] = "Your timetable has no sessions. You can't merge with other users if your timetable is empty";
+                    return RedirectToAction("Display", "Timetable", new { area = "TimetableArea" });
                 case 400:
                     TempData["Message"] = await response.Content.ReadAsStringAsync();
                     return RedirectToAction("Manage", "Session");
@@ -43,17 +52,6 @@ namespace Bongo.Areas.TimetableArea.Controllers
                     TempData["Message"] = "Please create your timetable before attempting to merge with anyone.";
                     return RedirectToAction("Upload", "Timetable");
             }
-
-        valid:
-            var apiViewModel = await response.Content.ReadFromJsonAsync<APIMergerIndexViewModel>();
-            viewModel = new MergerIndexViewModel
-            {
-                MergedUsers = apiViewModel.MergedUsers,
-                Users = apiViewModel.Users,
-                Sessions = SessionControlHelpers.Get2DArray(apiViewModel.Sessions),
-                isFirstSemester = _isForFirstSemester
-            };
-            return RedirectToAction("Index");
         }
 
         [MyAuthorize]

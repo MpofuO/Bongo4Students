@@ -22,6 +22,12 @@ namespace Bongo.MockAPI.Bongo.Controllers
             var user = await userManager.FindByNameAsync(name);
             return Ok(user.DecryptUser());
         }
+        [HttpGet]
+        public async Task<IActionResult> GetUserByEmail(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            return Ok(user.DecryptUser());
+        }
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] BongoUser user)

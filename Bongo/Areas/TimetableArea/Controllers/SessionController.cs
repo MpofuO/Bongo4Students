@@ -71,10 +71,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
         public async Task<IActionResult> ManageModules()
         {
-            await PopulateColorDLL();
-
-            return View("EditColors", await (await wrapper.Color.GetModulesWithColors()).
-                Content.ReadFromJsonAsync<ModulesColorsViewModel>());
+            return await EditColors();
         }
 
         [MyAuthorize]
@@ -102,7 +99,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             var response = await wrapper.Session.GetGroups();
             var groups = await response.Content.ReadFromJsonAsync<List<Lecture>>();
 
-            return View("Groups", groups);
+            return View("Groups", new GroupsViewModel { GroupedLectures = groups });
         }
 
         [MyAuthorize]
@@ -162,7 +159,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             if (response.IsSuccessStatusCode)
                 return View(await response.Content.ReadFromJsonAsync<SessionModuleColorViewModel>());
 
-            TempData["Message"] = "Session not found";
+            TempData["Message"] = "Session not found.";
             return RedirectToAction("Display", "Timetable");
         }
 
@@ -187,7 +184,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
             response = await wrapper.Color.GetModulesWithColors();
             var moduleColors = await response.Content.ReadFromJsonAsync<List<ModuleColor>>();
 
-            return View(new ModulesColorsViewModel()
+            return View("EditColors", new ModulesColorsViewModel()
             {
                 ModuleColors = moduleColors.Where(m => Request.Cookies["isForFirstSemester"] == "true" ?
                  (int.Parse(m.ModuleCode.Substring(6, 1)) == 0 || int.Parse(m.ModuleCode.Substring(6, 1)) % 2 == 1)
@@ -198,10 +195,11 @@ namespace Bongo.Areas.TimetableArea.Controllers
 
         [MyAuthorize]
         [HttpGet]
-        public async Task<IActionResult> RandomColorEdit(string activeAction)
+        public async Task<IActionResult> RandomColorEdit()
         {
             await wrapper.Session.SetColorsRandomly();
-            return RedirectToAction(activeAction == "EditColors" ? "EditColors" : "ManageModules");
+            TempData["Message"] = "Module colors have been randomly set and saved.";
+            return RedirectToAction("Display", "Timetable");
         }
         private void PopulateEndTimeDLL(string startTime, int periodCount)
         {

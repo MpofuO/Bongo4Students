@@ -125,6 +125,8 @@ public class MockAPISessionController : ControllerBase
 
             });
         }
+
+        UpdateAndSave();
         return true;
     }
     private void UpdateAndSave()
@@ -257,13 +259,13 @@ public class MockAPISessionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> SetColorsRandomly()
     {
-        var lstModuleColor = _repository.ModuleColor.GetByCondition(m => m.Username == Username).ToList();
+        var lstModuleColors = _repository.ModuleColor.GetByCondition(m => m.Username == Username).ToList();
         int colorId = 1;
-        foreach (var moduleColor in lstModuleColor)
+        foreach (var moduleColor in lstModuleColors)
         {
             moduleColor.ColorId = colorId++;
             _repository.ModuleColor.Update(moduleColor);
-            colorId = colorId > 14 ? 1 : colorId + 0;
+            colorId = colorId > 14 ? 1 : colorId;
         }
         _repository.SaveChanges();
         return StatusCode(204, "Changes saved successfully.");
@@ -308,7 +310,6 @@ public class MockAPISessionController : ControllerBase
         {
             if (AddNewSession(model))
                 return Ok("Session added successfully");
-            UpdateAndSave();
             return StatusCode(409, "Please confirm adding this session in place of existing one.");
         }
 

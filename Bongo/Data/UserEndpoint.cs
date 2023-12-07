@@ -29,6 +29,10 @@ namespace Bongo.Data
         {
             return await Client.GetAsync(new Uri($"{URI}/GetUserByName/{username}"));
         }
+        public async Task<HttpResponseMessage> GetUserByEmail(string email)
+        {
+            return await Client.GetAsync(new Uri($"{URI}/GetUserByEmail/{email}"));
+        }
 
         public async Task<HttpResponseMessage> Update(BongoUser user)
         {

@@ -130,6 +130,8 @@ namespace Bongo.MockAPI
             }
             else if(url.Contains("GetUserByName"))
                 result = user.GetUserByName(url.Substring(url.LastIndexOf('/') + 1));
+            else if (url.Contains("GetUserByEmail"))
+                result = user.GetUserByEmail(url.Substring(url.LastIndexOf('/') + 1));
         }
         private void HandleOnColor(string url, HttpContent content)
         {

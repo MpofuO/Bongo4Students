@@ -130,7 +130,16 @@ namespace Bongo.Controllers
             {
                 var result = await _wrapper.Authorization.VerifyEmail(email);
                 if (result.IsSuccessStatusCode)
-                    return View("AskSecurityQuestion", new AnswerSecurityQuestionViewModel { Email = email });
+                {
+                    var userResponse = await _wrapper.User.GetUserByEmail(email);
+                    var user = await userResponse.Content.ReadFromJsonAsync<BongoUser>();
+
+                    return View("AskSecurityQuestion", new AnswerSecurityQuestionViewModel
+                    {
+                        Email = email,
+                        SecurityQuestion = user.SecurityQuestion
+                    });
+                }
 
                 ModelState.AddModelError("", $"User with email {email} does not exist. Please enter a valid email.");
             }

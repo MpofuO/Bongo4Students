@@ -79,7 +79,7 @@ public class MockAPITimetableController : ControllerBase
                 }
                 _repository.SaveChanges();
 
-                return StatusCode(204,"Timetable successfully cleared.");
+                return StatusCode(204, "Timetable successfully cleared.");
             }
             catch
             {
@@ -113,17 +113,30 @@ public class MockAPITimetableController : ControllerBase
         {
             Regex pattern = new Regex(@"205 Nelson Mandela Drive  \|  Park West, Bloemfontein 9301 \| South Africa\nP\.O\. Box 339  \|  Bloemfontein 9300  \|  South Africa \| www\.ufs\.ac\.za|\nVenue Start End Day From To|Venue Start End Day From To\n");//|\(Group [A-Z]{1,2}\)|
             text = pattern.Replace(text, String.Empty);
-
-            Timetable newTimetable = _repository.Timetable.GetUserTimetable(Username) ?? new Timetable { TimetableText = text, Username = Username };
-            _repository.Timetable.Update(newTimetable);
-            SessionControlHelpers.AddNewUserModuleColor(ref _repository, Username, newTimetable.TimetableText);
-            _repository.SaveChanges();
-
-            return Ok("Timetable created/updated successfully");
+            CreateOrUpdate(text);
         }
+        else if (string.IsNullOrEmpty(text))
+            CreateOrUpdate(text);
         else
             return BadRequest("Something went wrong while uploading timetable. " +
                 "\n Please make sure your have uploaded your personal timetable");
+
+
+        return Ok("Timetable created/updated successfully");
+    }
+    private void CreateOrUpdate(string text)
+    {
+        Timetable timetable = _repository.Timetable.GetUserTimetable(Username) ?? new Timetable { TimetableText = text, Username = Username };
+
+        if (timetable.TimetableID == 0)
+            _repository.Timetable.Create(timetable);
+        else
+            _repository.Timetable.Update(timetable);
+
+        if (!string.IsNullOrEmpty(text))
+            SessionControlHelpers.AddNewUserModuleColor(ref _repository, Username, timetable.TimetableText);
+
+        _repository.SaveChanges();
     }
     #endregion PostMethods
 }

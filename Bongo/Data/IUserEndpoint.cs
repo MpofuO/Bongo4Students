@@ -9,5 +9,6 @@ namespace Bongo.Data
         public Task<HttpResponseMessage> Update(BongoUser user);
         public Task<HttpResponseMessage> Delete(BongoUser user);
         public Task<HttpResponseMessage> GetUserByName(string username);
+        public Task<HttpResponseMessage> GetUserByEmail(string username);
     }
 }

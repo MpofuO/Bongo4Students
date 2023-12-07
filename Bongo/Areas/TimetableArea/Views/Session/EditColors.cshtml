@@ -35,7 +35,7 @@
                         @if (activeAction != "EditColors")
                         {
                             <button class="btn btn-outline-primary mx-3" title="Delete Module"
-                        asp-controller="Session" asp-action="DeleteModule" asp-route-ModuleCode="@moduleColor.ModuleCode"
+                                    asp-controller="Session" asp-action="DeleteModule" asp-route-ModuleCode="@moduleColor.ModuleCode"
                                     type="submit" formmethod="post" onclick="return confirm('Are you sure you want to delete @(moduleColor.ModuleCode) from your modules?')">
                                 Delete
                             </button>
@@ -54,7 +54,7 @@
             <a asp-controller="Timetable" asp-action="Display" class="btn btn-primary " title="Go back"><i class=" fa-solid fa-arrow-left"></i></a>
             @if (Model.ModuleColors.Count() != 0)
             {
-                <a asp-controller="Session" asp-action="RandomColorEdit" asp-route-activeAction="@activeAction" class="btn btn-outline-primary ms-3" title="Randomly select color"><i class="fa-solid fa-bolt-lightning fa-beat-fade"></i></a>
+                <a asp-controller="Session" asp-action="RandomColorEdit" class="btn btn-outline-primary ms-3" title="Randomly select color"><i class="fa-solid fa-bolt-lightning fa-beat-fade"></i></a>
                 <button class="btn btn-outline-primary mx-3" type="submit" title="Save changes"><i class=" fa-solid fa-floppy-disk"></i></button>
             }
         </div>

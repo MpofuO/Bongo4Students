@@ -70,7 +70,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
                 case 400:
                     return RedirectToAction("Manage", "Session");
                 default:
-                    return View("Upload");
+                    return RedirectToAction("Upload");
             }
 
 
@@ -94,7 +94,7 @@ namespace Bongo.Areas.TimetableArea.Controllers
         [MyAuthorize]
         public async Task<IActionResult> Upload(IFormFile file, string[] startBlank, bool isFirstSemester = true)
         {
-            if (file != null)
+            if (file != null && startBlank.Count() == 0)
             {
                 if (file.Length < 500000) //revise
                 {
@@ -153,8 +153,11 @@ namespace Bongo.Areas.TimetableArea.Controllers
             }
             else
             {
-                if (startBlank.Count() != 0 && !(await wrapper.Timetable.ClearUserTable(1)).IsSuccessStatusCode)
+                if (startBlank.Count() != 0)
+                {
                     await wrapper.Timetable.UploadOrCreate("");
+                    return RedirectToAction("Display");
+                }
                 else
                     ModelState.AddModelError("", "No file was uploaded. Please upload file or select to continue without uploading.");
             }
